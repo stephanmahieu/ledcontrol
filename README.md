@@ -1,6 +1,11 @@
 # LedControl
 Java client that connects to Arduino via USB and controls a ledstrip
 
+I started this project december 2015. A new ledstrip should replace the current lightstrip (which has a few broken lightbulbs)
+that was on the house when we bought it. This webclient should control which effect to show.
+
+Current status: _**Work In Progress**_
+
 ## Two modules in this project
 
 ### SerialComm
