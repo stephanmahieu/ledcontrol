@@ -1,0 +1,56 @@
+.containing-element .ui-slider-switch {
+	width: 12em ;
+}
+
+#input-container {
+	text-shadow: none;
+	width: 100%;
+}
+
+#input-header {
+	width: 100%;
+	background-color: #BF4B57;
+}
+
+#input-title {
+	color: #FFFFFF;
+	display: inline-block;
+	padding-left: 5px;
+	font-weight: bold;
+}
+
+#input-status {
+	color: #F8FF00;
+	display: inline-block;
+	float: right;
+	font-size: 80%;
+	font-variant: small-caps;
+	font-style: italic;
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+#input {
+	width: 100%;
+	background-color: black;
+	color: white;
+	height: 200px;
+	overflow: auto;
+	
+}
+
+.inputdata {
+	font-family: monospace;
+}
+
+.debug {
+	color: #ADADAD;
+}
+
+.sent {
+	color: #21EE1E;
+}
+
+.received {
+	color: #F5F40A;
+}
