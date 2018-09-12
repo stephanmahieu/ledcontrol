@@ -17,4 +17,4 @@ Link: [serial-communication-in-java-with-raspberry-pi-and-rxtx](http://eclipseso
 
 Installeren java lib: `sudo apt-get install librxtx-java`
 
-serial device op mijn RPi: `/dev/ttyACM0`
+Serial device op mijn RPi: `/dev/ttyACM0`
