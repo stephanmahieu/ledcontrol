@@ -3,15 +3,13 @@ package ledcontrol.serialcomm.processor;
 import ledcontrol.serialcomm.model.*;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.ProducerTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SerialDataSender {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SerialDataSender.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(SerialDataSender.class);
 
     @EndpointInject(uri = "direct:sendSerialData")
     private ProducerTemplate sendSerial;
@@ -52,5 +50,19 @@ public class SerialDataSender {
         //command.getParam().add("dummy");
         jsonMessage.setCommand(command);
         sendSerial.sendBody(jsonMessage);
+    }
+
+    public void sendCommand(String commandName, String parameter) {
+        if (parameter == null) {
+            sendCommand(commandName);
+        } else {
+            List<String> parameters = new ArrayList<>();
+            parameters.add(parameter);
+            sendCommand(commandName, parameters);
+        }
+    }
+
+    public void sendCommand(String commandName) {
+        sendCommand(commandName, (List<String>)null);
     }
 }

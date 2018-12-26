@@ -3,8 +3,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="${properties.dir}ledcontrol.properties" />
-    </bean>
+
+    <!-- Beans -->
+    <import resource="classpath:webcontrol-beans.xml"/>
+
+    <!-- Camel -->
+    <import resource="classpath:camel-context.xml"/>
 
 </beans>

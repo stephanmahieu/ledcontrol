@@ -4,9 +4,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="serialJSONProcessor" class="ledcontrol.serialcomm.processor.SerialJSONProcessor"/>
-    <bean id="serialTextProcessor" class="ledcontrol.serialcomm.processor.SerialTextProcessor"/>
     <bean id="serialDataSender" class="ledcontrol.serialcomm.processor.SerialDataSender"/>
+    <bean id="serialTextProcessor" class="ledcontrol.serialcomm.processor.SerialTextProcessor"/>
 
-    <bean id="socketKeepAliveSender" class="ledcontrol.websocket.SocketKeepAliveSender"/>
-    <bean id="webSocketSender" class="ledcontrol.websocket.WebSocketSender"/>
+    <!--<bean id="socketKeepAliveSender" class="ledcontrol.websocket.SocketKeepAliveSender"/>-->
+    <!--<bean id="webSocketSender" class="ledcontrol.websocket.WebSocketSender"/>-->
 </beans>

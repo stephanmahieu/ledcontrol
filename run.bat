@@ -1,5 +1,3 @@
 @echo off
-set properties.dir=classpath:
-cd WebControl
-mvn jetty:run
-cd ..
+rem set properties.dir=classpath:
+java -jar WebControl\target\WebControl.jar

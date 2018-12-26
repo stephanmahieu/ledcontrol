@@ -2,18 +2,19 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
 
     <!-- Log to filesystem? -->
     <bean id="doLogCamelMsg" class="java.lang.Boolean">
         <constructor-arg value="${camel.wiretap.active}"/>
     </bean>
 
-    <!-- Override the default shutdown timeout of 300 secs (in case of inflight messages) -->
-    <bean id="shutdown" class="org.apache.camel.impl.DefaultShutdownStrategy">
-        <property name="timeout" value="${camel.shutdown.timeout}" />
-    </bean>
+    <!--&lt;!&ndash; Override the default shutdown timeout of 300 secs (in case of inflight messages) &ndash;&gt;-->
+    <!--<bean id="shutdown" class="org.apache.camel.impl.DefaultShutdownStrategy">-->
+        <!--<property name="timeout" value="${camel.shutdown.timeout}" />-->
+    <!--</bean>-->
 
 
     <camelContext xmlns="http://camel.apache.org/schema/spring">
@@ -23,12 +24,48 @@
         <endpoint id="textProcessor" uri="serialTextProcessor"/>
         <endpoint id="storeSerial2File" uri="file:///${camel.wiretap.directory}?fileName=received-$simple{date:now:yyyyMMdd'_'HHmmssSSS}-serial.txt"/>
 
-        <endpoint id="websocketPub" uri="websocket://0.0.0.0:9292/WebControl/websocket-pub?sendToAll=true"/>
-        <endpoint id="socketKeepAlive" uri="socketKeepAliveSender"/>
-
         <dataFormats>
             <json id="jack" library="Jackson" unmarshalTypeName="ledcontrol.serialcomm.model.ArduinoMessageImpl" include="NON_NULL"/>
         </dataFormats>
+
+        <rest path="/api" produces="application/json">
+            <get uri="/dim/{value}">
+                <route>
+                    <bean ref="serialDataSender" method="sendCommand('brightness', ${header.value})"/>
+                </route>
+            </get>
+
+            <get uri="/effect/{value}">
+                <route>
+                    <bean ref="serialDataSender" method="sendEffect(${header.value})"/>
+                </route>
+            </get>
+
+            <get uri="/status">
+                <route>
+                    <bean ref="serialDataSender" method="sendStatusRequest"/>
+                </route>
+            </get>
+
+            <get uri="/reset">
+                <route>
+                    <bean ref="serialDataSender" method="sendReset"/>
+                </route>
+            </get>
+
+            <get uri="/debug/{boolean}">
+                <route>
+                    <bean ref="serialDataSender" method="sendDebugState(${header.boolean})"/>
+                </route>
+            </get>
+
+            <get uri="/command/{command}">
+                <route>
+                    <bean ref="serialDataSender" method="sendCommand(${header.command})"/>
+                </route>
+            </get>
+        </rest>
+
 
         <route id="receiveSerial" streamCache="true">
             <from ref="serialComm"/>
@@ -67,6 +104,8 @@
             <to ref="serialComm" pattern="OutOnly"/>
         </route>
 
+
+
         <!-- route id="testSendSerial" streamCache="true">
             <from uri="timer:test?period=5seconds"/>
             <setBody>
@@ -76,22 +115,22 @@
             <to ref="serialComm" pattern="OutOnly"/>
         </route -->
 
-        <route id="sendWebsocket" streamCache="true">
-            <from uri="direct:sendWebsocketData"/>
-            <to ref="websocketPub" pattern="OutOnly"/>
-        </route>
+        <!--<route id="sendWebsocket" streamCache="true">-->
+            <!--<from uri="direct:sendWebsocketData"/>-->
+            <!--<to ref="websocketPub" pattern="OutOnly"/>-->
+        <!--</route>-->
 
-        <route id="echoWebsocket" streamCache="true">
-            <from ref="websocketPub"/>
-            <to ref="websocketPub" pattern="OutOnly"/>
-        </route>
+        <!--<route id="echoWebsocket" streamCache="true">-->
+            <!--<from ref="websocketPub"/>-->
+            <!--<to ref="websocketPub" pattern="OutOnly"/>-->
+        <!--</route>-->
 
-        <!-- Periodically send some data to keep the websocket connection alive -->
-        <route id="keepWebsocketAlive" streamCache="false">
-            <!-- Every 250 sec -->
-            <from uri="timer://foo?fixedRate=false&amp;period=250000"/>
-            <to ref="socketKeepAlive" pattern="OutOnly"/>
-        </route>
+        <!--&lt;!&ndash; Periodically send some data to keep the websocket connection alive &ndash;&gt;-->
+        <!--<route id="keepWebsocketAlive" streamCache="false">-->
+            <!--&lt;!&ndash; Every 250 sec &ndash;&gt;-->
+            <!--<from uri="timer://foo?fixedRate=false&amp;period=250000"/>-->
+            <!--<to ref="socketKeepAlive" pattern="OutOnly"/>-->
+        <!--</route>-->
 
     </camelContext>
 

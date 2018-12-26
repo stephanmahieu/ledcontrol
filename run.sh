@@ -1,6 +1,6 @@
 #!/bin/bash
-cd WebControl
 
-export MAVEN_OPTS="-Djava.library.path=/usr/lib/jni/ -Dproperties.dir=classpath:"
+# export MAVEN_OPTS="-Djava.library.path=/usr/lib/jni/ -Dproperties.dir=classpath:"
+# mvn spring-boot:run
 
-mvn jetty:run
+java -Djava.library.path=/usr/lib/jni/ -Dproperties.dir=classpath: -jar WebControl/target/WebControl.jar
