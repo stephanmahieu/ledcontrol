@@ -255,7 +255,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${springboot.version}</version>
                 <configuration>
-                    <!-- find the main class in a module -->
+                    <!-- this enables using mvn spring-boot:run from the parent (actual spring-boot app is in a module) -->
                     <skip>true</skip>
                 </configuration>
             </plugin>

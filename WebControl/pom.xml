@@ -20,10 +20,6 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
@@ -105,7 +101,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- enable using mvn spring-boot:run from the parent: -->
+                <!-- this enables using mvn spring-boot:run from the parent (spring-boot app is in this module) -->
                 <configuration>
                     <!--<fork>true</fork>-->
                     <skip>false</skip>
