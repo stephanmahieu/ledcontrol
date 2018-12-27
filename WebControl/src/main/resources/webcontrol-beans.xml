@@ -6,7 +6,4 @@
     <bean id="serialJSONProcessor" class="ledcontrol.serialcomm.processor.SerialJSONProcessor"/>
     <bean id="serialDataSender" class="ledcontrol.serialcomm.processor.SerialDataSender"/>
     <bean id="serialTextProcessor" class="ledcontrol.serialcomm.processor.SerialTextProcessor"/>
-
-    <!--<bean id="socketKeepAliveSender" class="ledcontrol.websocket.SocketKeepAliveSender"/>-->
-    <!--<bean id="webSocketSender" class="ledcontrol.websocket.WebSocketSender"/>-->
 </beans>

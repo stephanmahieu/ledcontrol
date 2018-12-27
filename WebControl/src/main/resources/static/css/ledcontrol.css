@@ -36,11 +36,13 @@
 	color: white;
 	height: 200px;
 	overflow: auto;
-	
+	text-shadow: none;
 }
 
 .inputdata {
 	font-family: monospace;
+	padding-left: 6px;
+	word-break: break-all;
 }
 
 .debug {

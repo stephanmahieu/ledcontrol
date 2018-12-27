@@ -16,6 +16,10 @@
         <!--<property name="timeout" value="${camel.shutdown.timeout}" />-->
     <!--</bean>-->
 
+    <bean id="websocket" class="org.apache.camel.component.websocket.WebsocketComponent">
+        <!-- On RasPi the default of 3 (1 + noCores * 2) is insufficient, need at least 4. -->
+        <property name="maxThreads" value="4"/>
+    </bean>
 
     <camelContext xmlns="http://camel.apache.org/schema/spring">
 
@@ -23,6 +27,9 @@
         <endpoint id="jsonProcessor" uri="serialJSONProcessor"/>
         <endpoint id="textProcessor" uri="serialTextProcessor"/>
         <endpoint id="storeSerial2File" uri="file:///${camel.wiretap.directory}?fileName=received-$simple{date:now:yyyyMMdd'_'HHmmssSSS}-serial.txt"/>
+
+        <endpoint id="websocketPub" uri="websocket://0.0.0.0:9292/websocket-pub?sendToAll=true"/>
+        <endpoint id="socketKeepAlive" uri="socketKeepAliveSender"/>
 
         <dataFormats>
             <json id="jack" library="Jackson" unmarshalTypeName="ledcontrol.serialcomm.model.ArduinoMessageImpl" include="NON_NULL"/>
@@ -80,10 +87,25 @@
                 <when>
                     <simple>${body} regex '^\{.*'</simple>
                     <!-- if message starts with '{' its probably JSON -->
+
+                    <!-- Send to websocket for monitoring purpose -->
+                    <wireTap uri="websocketPub" pattern="OutOnly">
+                        <body>
+                            <simple>INJ: [${date:now:yyyyMMdd-HHmmss}] ${body}</simple>
+                        </body>
+                    </wireTap>
+
                     <unmarshal ref="jack"/>
                     <to ref="jsonProcessor" pattern="InOnly"/>
                 </when>
                 <otherwise>
+                    <!-- Send to websocket for monitoring purpose -->
+                    <wireTap uri="websocketPub" pattern="OutOnly">
+                        <body>
+                            <simple>INT: [${date:now:yyyyMMdd-HHmmss}] ${body}</simple>
+                        </body>
+                    </wireTap>
+
                     <to ref="textProcessor" pattern="InOnly"/>
                 </otherwise>
             </choice>
@@ -101,6 +123,14 @@
         <route id="sendSerial" streamCache="true">
             <from uri="direct:sendSerialData"/>
             <marshal ref="jack"/>
+
+            <!-- Send to websocket for monitoring purpose -->
+            <wireTap uri="websocketPub" pattern="OutOnly">
+                <body>
+                    <simple>OUT: [${date:now:yyyyMMdd-HHmmss}] ${body}</simple>
+                </body>
+            </wireTap>
+
             <to ref="serialComm" pattern="OutOnly"/>
         </route>
 
@@ -115,22 +145,27 @@
             <to ref="serialComm" pattern="OutOnly"/>
         </route -->
 
-        <!--<route id="sendWebsocket" streamCache="true">-->
-            <!--<from uri="direct:sendWebsocketData"/>-->
-            <!--<to ref="websocketPub" pattern="OutOnly"/>-->
-        <!--</route>-->
+        <route id="sendWebsocket" streamCache="true">
+            <from uri="direct:sendWebsocketData"/>
+            <to ref="websocketPub" pattern="OutOnly"/>
+        </route>
 
-        <!--<route id="echoWebsocket" streamCache="true">-->
-            <!--<from ref="websocketPub"/>-->
-            <!--<to ref="websocketPub" pattern="OutOnly"/>-->
-        <!--</route>-->
+        <route id="echoWebsocket" streamCache="true">
+            <from ref="websocketPub"/>
+            <to ref="websocketPub" pattern="OutOnly"/>
+        </route>
 
-        <!--&lt;!&ndash; Periodically send some data to keep the websocket connection alive &ndash;&gt;-->
-        <!--<route id="keepWebsocketAlive" streamCache="false">-->
-            <!--&lt;!&ndash; Every 250 sec &ndash;&gt;-->
-            <!--<from uri="timer://foo?fixedRate=false&amp;period=250000"/>-->
-            <!--<to ref="socketKeepAlive" pattern="OutOnly"/>-->
-        <!--</route>-->
+        <!-- Periodically send some data to keep the websocket connection alive -->
+        <route id="keepWebsocketAlive" streamCache="false">
+            <!-- Every 250 sec (default maxIdleTime Websocket Component is 300s) -->
+            <from uri="timer://foo?fixedRate=false&amp;period=250000"/>
+
+            <transform>
+                <simple>keep-alive</simple>
+            </transform>
+
+            <to ref="websocketPub" pattern="OutOnly"/>
+        </route>
 
     </camelContext>
 

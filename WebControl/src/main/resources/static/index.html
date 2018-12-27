@@ -45,7 +45,116 @@
             $.get("/rest/api/command/" + 'Hello-world!');
         });
 
+        $("#debugOn").click(function(event) {
+            $.get("/rest/api/debug/true");
+        });
+
+        $("#debugOff").click(function(event) {
+            $.get("/rest/api/debug/false");
+        });
+
+
+        // Open a WebSocket connection.
+        var wsUri = getWebSocketRootUri() + "/websocket-pub";
+        websocket = new WebSocket(wsUri);
+
+        // Connected to server
+        websocket.onopen = function(ev) {
+            $('#input-status').text('Connected to server');
+        };
+
+        // Connection close
+        websocket.onclose = function(ev) {
+            $('#input-status').text('Disconnected from server');
+        };
+
+        // Message Received
+        websocket.onmessage = function(ev) {
+            if (ev.data == "keep-alive") {
+                //websocket.send("echo-alive");
+                return;
+            }
+            var msgClass = "";
+            if (ev.data.match("^INT:")) {
+                msgClass = "debug";
+            } else if (ev.data.match("^INJ:")) {
+                msgClass = "received";
+            } else if (ev.data.match("^OUT:")) {
+                msgClass = "sent";
+            }
+
+            var msg = $('<div>').addClass("inputdata " + msgClass).text(ev.data);
+            $('#input').append(msg);
+
+            // var json = $.parseJSON(ev.data);
+            //
+            // var msgClass = "";
+            // var msgText = json.date + " ";
+            // if (json.type == "COMMON" && json.command == "DEBUG") {
+            //     msgClass = "debugOn";
+            //     msgText += "DBG";
+            // }
+            // else if (json.toUnitId == 0) {
+            //     msgClass = "received";
+            //     msgText += "<<<";
+            // }
+            // else {
+            //     msgClass = "sent";
+            //     msgText += ">>>";
+            // }
+            // msgText += (" " + json.message.safe);
+            //
+            // var msg = $('<div>').addClass("inputdata " + msgClass).text(msgText);
+            // $('#input').append(msg);
+
+            //var msgClass = "debugOn";
+            //if (ev.data.substring(13, 16) == ">>>") {
+            //	msgClass = "sent";
+            //}
+            //else if (ev.data.substring(13, 16) == "<<<") {
+            //	msgClass = "received";
+            //}
+            //var msg = $('<div>').addClass("inputdata " + msgClass).text(ev.data);
+            //$('#input').append(msg);
+
+            if (!isTouchDevice() && isStickingToBottom()) {
+                scrollToBottom();
+            }
+        };
+
+        // Error
+        websocket.onerror = function(ev) {
+            $('#input-status').text(ev.data);
+        };
+
     });
+
+    function getWebSocketRootUri() {
+        return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":9292";
+    }
+
+    function isTouchDevice() {
+        try {
+            document.createEvent("TouchEvent");
+            return true;
+        } catch(e) {
+            return false;
+        }
+    }
+
+    function scrollToBottom() {
+        var scrollHeight = $("#input").prop("scrollHeight");
+        //$('#input').scrollTop(scrollHeight);
+        $("#input").animate({scrollTop: scrollHeight}, 150);
+    }
+
+    function isStickingToBottom() {
+        var scrollHeight = $("#input").prop("scrollHeight");
+        var innerHeight = $("#input").innerHeight();
+        var scrollMaxPos = scrollHeight - innerHeight;
+        var scrollPos = $('#input').scrollTop();
+        return (scrollMaxPos - scrollPos) < 25;
+    }
 </script>
 
 <div data-role="page">
@@ -101,7 +210,24 @@
                 <td><a href="#" id="12" class="effect" data-role="button" data-theme="b" data-inline="true">Ripple</a></td>
             </tr>
         </table>
-
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 100%">
+                    <div id="input-container">
+                        <div id="input-header">
+                            <div id="input-title">Monitor</div><div id="input-status">Not connected</div>
+                        </div>
+                        <div id="input"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="#" id="debugOn" class="special" data-role="button" data-theme="b" data-inline="true">Debug On</a>
+                    <a href="#" id="debugOff" class="special" data-role="button" data-theme="b" data-inline="true">Debug Off</a>
+                </td>
+            </tr>
+        </table>
+        <!--<div id="input-status">Not connected</div>-->
+        <!--<div id="input"></div>-->
     </div>
 
     <div data-role="footer">
