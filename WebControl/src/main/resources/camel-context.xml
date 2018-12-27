@@ -114,11 +114,12 @@
         </route>
 
         <route id="initSerial">
-            <!-- Fire once after 5 seconds -->
+            <!-- Fire twice after 3 seconds -->
             <from uri="timer://foo?repeatCount=2&amp;period=1500&amp;delay=3000"/>
             <transform>
                 <simple>{"type":"STATUS"}\n</simple>
             </transform>
+            <to ref="dataOutLogger" pattern="OutOnly"/>
             <to ref="serialComm" pattern="OutOnly"/>
         </route>
 
@@ -134,7 +135,6 @@
             </wireTap>
 
             <to ref="dataOutLogger" pattern="OutOnly"/>
-
             <to ref="serialComm" pattern="OutOnly"/>
         </route>
 
