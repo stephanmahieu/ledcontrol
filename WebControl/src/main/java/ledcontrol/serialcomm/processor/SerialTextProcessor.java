@@ -12,6 +12,6 @@ public class SerialTextProcessor {
         SerialMessage serialMessage = exchange.getIn(SerialMessage.class);
         String serialData = (String)serialMessage.getBody();
 
-        LOG.info("TEXT Data received: [{}]", serialData);
+        LOG.debug("TEXT Data received: [{}]", serialData);
     }
 }

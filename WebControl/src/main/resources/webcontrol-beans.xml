@@ -6,4 +6,5 @@
     <bean id="serialJSONProcessor" class="ledcontrol.serialcomm.processor.SerialJSONProcessor"/>
     <bean id="serialDataSender" class="ledcontrol.serialcomm.processor.SerialDataSender"/>
     <bean id="serialTextProcessor" class="ledcontrol.serialcomm.processor.SerialTextProcessor"/>
+    <bean id="serialDataLogger" class="ledcontrol.serialcomm.processor.SerialDataLogger"/>
 </beans>

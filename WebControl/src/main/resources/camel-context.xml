@@ -28,6 +28,8 @@
         <endpoint id="textProcessor" uri="serialTextProcessor"/>
         <endpoint id="storeSerial2File" uri="file:///${camel.wiretap.directory}?fileName=received-$simple{date:now:yyyyMMdd'_'HHmmssSSS}-serial.txt"/>
 
+        <endpoint id="dataOutLogger" uri="serialDataLogger"/>
+
         <endpoint id="websocketPub" uri="websocket://0.0.0.0:9292/websocket-pub?sendToAll=true"/>
         <endpoint id="socketKeepAlive" uri="socketKeepAliveSender"/>
 
@@ -130,6 +132,8 @@
                     <simple>OUT: [${date:now:yyyyMMdd-HHmmss}] ${body}</simple>
                 </body>
             </wireTap>
+
+            <to ref="dataOutLogger" pattern="OutOnly"/>
 
             <to ref="serialComm" pattern="OutOnly"/>
         </route>

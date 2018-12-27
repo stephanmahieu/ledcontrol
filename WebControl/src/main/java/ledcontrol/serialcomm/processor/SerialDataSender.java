@@ -9,8 +9,6 @@ import java.util.List;
 
 public class SerialDataSender {
 
-//    private static final Logger LOG = LoggerFactory.getLogger(SerialDataSender.class);
-
     @EndpointInject(uri = "direct:sendSerialData")
     private ProducerTemplate sendSerial;
 

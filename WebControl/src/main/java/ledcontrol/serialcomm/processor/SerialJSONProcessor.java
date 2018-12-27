@@ -11,21 +11,21 @@ public class SerialJSONProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(SerialJSONProcessor.class);
 
     public void receiveJSONData(ArduinoMessageImpl message) {
-        LOG.info("JSON Data received, type:[{}]", message.getType());
+        LOG.debug("JSON Data received, type:[{}]", message.getType());
 
         switch(message.getType()) {
             case STATUS:
-                LOG.info("- Status::Current effect : [{}]", message.getStatus().getEffect());
-                LOG.info("- Status::Auto Brightness: [{}]", message.getStatus().isAutoBrightness());
-                LOG.info("- Status::Brightness     : [{}]", message.getStatus().getBrightness());
-                LOG.info("- Status::No. of LEDs    : [{}]", message.getStatus().getNoOfLeds());
-                LOG.info("- Status::FPS            : [{}]", message.getStatus().getFps());
-                LOG.info("- Status::Free memory    : [{}]", message.getStatus().getFreeMemory());
-                LOG.info("- Status::DebugIsOn      : [{}]", message.getStatus().isDebugOn());
+                LOG.trace("- Status::Current effect : [{}]", message.getStatus().getEffect());
+                LOG.trace("- Status::Auto Brightness: [{}]", message.getStatus().isAutoBrightness());
+                LOG.trace("- Status::Brightness     : [{}]", message.getStatus().getBrightness());
+                LOG.trace("- Status::No. of LEDs    : [{}]", message.getStatus().getNoOfLeds());
+                LOG.trace("- Status::FPS            : [{}]", message.getStatus().getFps());
+                LOG.trace("- Status::Free memory    : [{}]", message.getStatus().getFreeMemory());
+                LOG.trace("- Status::DebugIsOn      : [{}]", message.getStatus().isDebugOn());
                 break;
 
             case LOG:
-                LOG.info("- Info::[{}]", message.getLoggingInfo().getInfo());
+                LOG.trace("- Info::[{}]", message.getLoggingInfo().getInfo());
                 break;
 
             default:
