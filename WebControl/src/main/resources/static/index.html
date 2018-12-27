@@ -12,12 +12,14 @@
 
 <body>
 <script type="text/javascript">
-
     $(document).ready(function(){
         $("#dim").bind("slidestop vclick", function(event) {
             var value = $(this)[0].value;
             $.get('/rest/api/dim/' + value);
         });
+
+        // set initial state flipswitch to Automatic (off)
+        $("#manual-dim").val('off').flipswitch('refresh');
 
         $("#manual-dim").bind("change", function(event) {
             if ($("#manual-dim").val() === 'on') {
@@ -29,11 +31,12 @@
                 $.get('/rest/api/dim/' + "auto");
             }
         });
-        // set initial state flispwith to Automatic (off)
-        $("#manual-dim").val('off').slider('refresh');
+
 
         $(".effect").click(function(event) {
             $.get('/rest/api/effect/' + $(this)[0].id);
+            $(".current-effect").removeClass("current-effect");
+            $(this).addClass("current-effect");
         });
 
         // status / reset
@@ -85,6 +88,41 @@
 
             var msg = $('<div>').addClass("inputdata " + msgClass).text(ev.data);
             $('#input').append(msg);
+
+
+            // use received status (json) to update the controls to reflect the current state
+            var indexAcc = ev.data.indexOf('{');
+            if (indexAcc >= 0) {
+                var jsonData = ev.data.substring(indexAcc);
+                var json = $.parseJSON(jsonData);
+                if ('STATUS' === json.type && json.status) {
+                    var status = json.status;
+                    if (status.effect) {
+                        var effectNo = effectToInt(json.status.effect);
+                        $(".current-effect").removeClass("current-effect");
+                        $("#" + effectNo).addClass("current-effect");
+                    }
+                    if (status.brightness) {
+                        if ($("#dim").val() !== status.brightness) {
+                            // this will trigger a change and that will send a dim command!
+                            $("#dim").val(status.brightness).slider("refresh");
+                        }
+                    }
+                    if (status.autoBrightness === false) {
+                        // manual == on
+                        if ('off' === $("#manual-dim").val()) {
+                            $("#manual-dim").val("on").flipswitch("refresh");
+                        }
+                        $("#dim").slider('enable');
+                    } else {
+                        // automatic == off
+                        if ('on' === $("#manual-dim").val()) {
+                            $("#manual-dim").val('off').flipswitch('refresh');
+                        }
+                        $("#dim").slider('disable');
+                    }
+                }
+            }
 
             // var json = $.parseJSON(ev.data);
             //
@@ -155,6 +193,25 @@
         var scrollPos = $('#input').scrollTop();
         return (scrollMaxPos - scrollPos) < 25;
     }
+
+    function effectToInt(name) {
+        switch (name) {
+            case "Blank": return 0;
+            case "RainbowMarch": return 1;
+            case "SoftTwinkles": return 2;
+            case "ColorTwinkles": return 3;
+            case "DutchFlag": return 4;
+            case "Cylon": return 5;
+            case "Pride2015demo": return 6;
+            case "DiscoStrobe": return 7;
+            case "Gradient": return 8;
+            case "AntiAlias": return 9;
+            case "Fireworks": return 10;
+            case "RunningDot": return 11;
+            case "Ripple": return 12;
+            default: return 1;
+        }
+    }
 </script>
 
 <div data-role="page">
@@ -174,9 +231,10 @@
             <tr>
                 <td>
                     <div class="containing-element">
-                        <select name="manual-dim" id="manual-dim" data-role="slider">
-                            <option value="on">Brightness Manual</option>
-                            <option value="off">Brightness Auto</option>
+                        <label for="manual-dim">Manual Brightness:</label>
+                        <select name="manual-dim" id="manual-dim" data-role="flipswitch">
+                            <option value="on">On</option>
+                            <option value="off">Auto</option>
                         </select>
                     </div>
                 </td>
