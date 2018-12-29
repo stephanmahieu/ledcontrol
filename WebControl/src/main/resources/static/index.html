@@ -19,30 +19,14 @@
         var dimSwitchObj = $("#manual-dim");
         var statusObj = $('#input-status');
 
-        dimObj.on("slidestop vclick", function(event) {
-            var value = $(this)[0].value;
-            $.get('/rest/api/dim/' + value);
-        });
+        dimObj.on("slidestop vclick", dimChangeHandler);
 
         // set initial state flipswitch to Automatic (off)
         dimSwitchObj.val('off').flipswitch('refresh');
 
-        dimSwitchObj.on("change", function(event) {
-            if (dimSwitchObj.val() === 'on') {
-                dimObj.slider('enable');
-                var value = dimObj.val();
-                $.get('/rest/api/dim/' + value);
-            } else {
-                dimObj.slider('disable');
-                $.get('/rest/api/dim/' + "auto");
-            }
-        });
+        dimSwitchObj.on("change", dimSwitchChangeHandler);
 
-        $(".effect").click(function(event) {
-            $.get('/rest/api/effect/' + $(this)[0].id);
-            $(".current-effect").removeClass("current-effect");
-            $(this).addClass("current-effect");
-        });
+        $(".effect").click(effectChangeHandler);
 
         // status / reset
         $(".common").click(function(event) {
@@ -114,20 +98,32 @@
                     }
                     if (status.brightness) {
                         if (dimObj.val() !== status.brightness) {
-                            // this will trigger a change and that will send a dim command!
-                            dimObj.val(status.brightness).slider("refresh");
+                            // prevent triggering the changehandler and send a dim command!
+                            dimObj
+                                .off('slidestop vclick')
+                                .val(status.brightness).slider("refresh")
+                                .on('slidestop vclick', dimChangeHandler);
                         }
                     }
                     if (status.autoBrightness === false) {
                         // manual == on
                         if ('off' === dimSwitchObj.val()) {
-                            dimSwitchObj.val("on").flipswitch("refresh");
+                            // prevent triggering the changehandler and send a command!
+                            dimSwitchObj
+                                .off("change")
+                                .val('on').flipswitch('refresh')
+                                .on("change", dimSwitchChangeHandler);
                         }
                         dimObj.slider('enable');
                     } else {
                         // automatic == off
                         if ('on' === dimSwitchObj.val()) {
-                            dimSwitchObj.val('off').flipswitch('refresh');
+                            // prevent triggering the changehandler and send a command!
+                            dimSwitchObj
+                                .off("change")
+                                .val('off').flipswitch('refresh')
+                                .on("change", dimSwitchChangeHandler);
+
                         }
                         dimObj.slider('disable');
                     }
@@ -139,6 +135,30 @@
             }
         };
     });
+
+    function dimSwitchChangeHandler() {
+        var dimObj = $("#dim");
+        if ( $("#manual-dim").val() === 'on') {
+            dimObj.slider('enable');
+            var value = dimObj.val();
+            $.get('/rest/api/dim/' + value);
+        } else {
+            dimObj.slider('disable');
+            $.get('/rest/api/dim/' + "auto");
+        }
+    }
+
+    function dimChangeHandler() {
+        var value = $("#dim").val();
+        $.get('/rest/api/dim/' + value);
+    }
+
+    function effectChangeHandler(event) {
+        var effectId = event.currentTarget.id;
+        $.get('/rest/api/effect/' + effectId);
+        $(".current-effect").removeClass("current-effect");
+        event.currentTarget.classList.add("current-effect");
+    }
 
     function getWebSocketRootUri() {
         return "ws://" + (document.location.hostname === "" ? "localhost" : document.location.hostname) + ":9292";
