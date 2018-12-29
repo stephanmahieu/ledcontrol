@@ -60,3 +60,21 @@
 .current-effect {
 	color: #b1ff00 !important;
 }
+
+/* custom flipswitch labels */
+#flipswitchWrapper .ui-flipswitch {
+	width: 200px;
+}
+#flipswitchWrapper .ui-flipswitch-active {
+	padding-left: 0;
+}
+#flipswitchWrapper .ui-flipswitch .ui-flipswitch-on, #flipswitchWrapper .ui-flipswitch.ui-flipswitch-active .ui-flipswitch-on {
+	text-indent: -20em;
+}
+#flipswitchWrapper .ui-flipswitch.ui-flipswitch-active .ui-flipswitch-on {
+	margin-left: 170px;
+	text-indent: -10em;
+}
+#flipswitchWrapper .ui-flipswitch .ui-flipswitch-off {
+	text-indent: .5em;
+}
