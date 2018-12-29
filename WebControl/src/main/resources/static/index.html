@@ -12,26 +12,31 @@
 
 <body>
 <script type="text/javascript">
+    var websocket;
+
     $(document).ready(function(){
-        $("#dim").bind("slidestop vclick", function(event) {
+        var dimObj = $("#dim");
+        var dimSwitchObj = $("#manual-dim");
+        var statusObj = $('#input-status');
+
+        dimObj.on("slidestop vclick", function(event) {
             var value = $(this)[0].value;
             $.get('/rest/api/dim/' + value);
         });
 
         // set initial state flipswitch to Automatic (off)
-        $("#manual-dim").val('off').flipswitch('refresh');
+        dimSwitchObj.val('off').flipswitch('refresh');
 
-        $("#manual-dim").bind("change", function(event) {
-            if ($("#manual-dim").val() === 'on') {
-                $("#dim").slider('enable');
-                var value = $("#dim").val();
+        dimSwitchObj.on("change", function(event) {
+            if (dimSwitchObj.val() === 'on') {
+                dimObj.slider('enable');
+                var value = dimObj.val();
                 $.get('/rest/api/dim/' + value);
             } else {
-                $("#dim").slider('disable');
+                dimObj.slider('disable');
                 $.get('/rest/api/dim/' + "auto");
             }
         });
-
 
         $(".effect").click(function(event) {
             $.get('/rest/api/effect/' + $(this)[0].id);
@@ -63,20 +68,26 @@
 
         // Connected to server
         websocket.onopen = function(ev) {
-            $('#input-status').text('Connected to server');
+            statusObj.text('Connected to server');
         };
 
         // Connection close
         websocket.onclose = function(ev) {
-            $('#input-status').text('Disconnected from server');
+            statusObj.text('Disconnected from server');
+        };
+
+        // Error
+        websocket.onerror = function(ev) {
+            statusObj.text(ev.data);
         };
 
         // Message Received
         websocket.onmessage = function(ev) {
-            if (ev.data == "keep-alive") {
+            if (ev.data === "keep-alive") {
                 //websocket.send("echo-alive");
                 return;
             }
+
             var msgClass = "";
             if (ev.data.match("^INT:")) {
                 msgClass = "debug";
@@ -88,7 +99,6 @@
 
             var msg = $('<div>').addClass("inputdata " + msgClass).text(ev.data);
             $('#input').append(msg);
-
 
             // use received status (json) to update the controls to reflect the current state
             var indexAcc = ev.data.indexOf('{');
@@ -103,72 +113,35 @@
                         $("#" + effectNo).addClass("current-effect");
                     }
                     if (status.brightness) {
-                        if ($("#dim").val() !== status.brightness) {
+                        if (dimObj.val() !== status.brightness) {
                             // this will trigger a change and that will send a dim command!
-                            $("#dim").val(status.brightness).slider("refresh");
+                            dimObj.val(status.brightness).slider("refresh");
                         }
                     }
                     if (status.autoBrightness === false) {
                         // manual == on
-                        if ('off' === $("#manual-dim").val()) {
-                            $("#manual-dim").val("on").flipswitch("refresh");
+                        if ('off' === dimSwitchObj.val()) {
+                            dimSwitchObj.val("on").flipswitch("refresh");
                         }
-                        $("#dim").slider('enable');
+                        dimObj.slider('enable');
                     } else {
                         // automatic == off
-                        if ('on' === $("#manual-dim").val()) {
-                            $("#manual-dim").val('off').flipswitch('refresh');
+                        if ('on' === dimSwitchObj.val()) {
+                            dimSwitchObj.val('off').flipswitch('refresh');
                         }
-                        $("#dim").slider('disable');
+                        dimObj.slider('disable');
                     }
                 }
             }
-
-            // var json = $.parseJSON(ev.data);
-            //
-            // var msgClass = "";
-            // var msgText = json.date + " ";
-            // if (json.type == "COMMON" && json.command == "DEBUG") {
-            //     msgClass = "debugOn";
-            //     msgText += "DBG";
-            // }
-            // else if (json.toUnitId == 0) {
-            //     msgClass = "received";
-            //     msgText += "<<<";
-            // }
-            // else {
-            //     msgClass = "sent";
-            //     msgText += ">>>";
-            // }
-            // msgText += (" " + json.message.safe);
-            //
-            // var msg = $('<div>').addClass("inputdata " + msgClass).text(msgText);
-            // $('#input').append(msg);
-
-            //var msgClass = "debugOn";
-            //if (ev.data.substring(13, 16) == ">>>") {
-            //	msgClass = "sent";
-            //}
-            //else if (ev.data.substring(13, 16) == "<<<") {
-            //	msgClass = "received";
-            //}
-            //var msg = $('<div>').addClass("inputdata " + msgClass).text(ev.data);
-            //$('#input').append(msg);
 
             if (!isTouchDevice() && isStickingToBottom()) {
                 scrollToBottom();
             }
         };
-
-        // Error
-        websocket.onerror = function(ev) {
-            $('#input-status').text(ev.data);
-        };
-
     });
 
     function getWebSocketRootUri() {
-        return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":9292";
+        return "ws://" + (document.location.hostname === "" ? "localhost" : document.location.hostname) + ":9292";
     }
 
     function isTouchDevice() {
@@ -181,16 +154,18 @@
     }
 
     function scrollToBottom() {
-        var scrollHeight = $("#input").prop("scrollHeight");
+        var inputObj = $("#input");
+        var scrollHeight = inputObj.prop("scrollHeight");
         //$('#input').scrollTop(scrollHeight);
-        $("#input").animate({scrollTop: scrollHeight}, 150);
+        inputObj.animate({scrollTop: scrollHeight}, 150);
     }
 
     function isStickingToBottom() {
-        var scrollHeight = $("#input").prop("scrollHeight");
-        var innerHeight = $("#input").innerHeight();
+        var inputObj =  $("#input");
+        var scrollHeight = inputObj.prop("scrollHeight");
+        var innerHeight = inputObj.innerHeight();
         var scrollMaxPos = scrollHeight - innerHeight;
-        var scrollPos = $('#input').scrollTop();
+        var scrollPos = inputObj.scrollTop();
         return (scrollMaxPos - scrollPos) < 25;
     }
 
@@ -283,8 +258,6 @@
                 </td>
             </tr>
         </table>
-        <!--<div id="input-status">Not connected</div>-->
-        <!--<div id="input"></div>-->
     </div>
 
     <div data-role="footer">
