@@ -12,12 +12,12 @@
 
 <body>
 <script type="text/javascript">
-    var websocket;
+    let websocket;
 
     $(document).ready(function(){
-        var dimObj = $("#dim");
-        var dimSwitchObj = $("#manual-dim");
-        var statusObj = $('#input-status');
+        let dimObj = $("#dim");
+        let dimSwitchObj = $("#manual-dim");
+        let statusObj = $('#input-status');
 
         dimObj.on("slidestop vclick", dimChangeHandler);
 
@@ -47,7 +47,7 @@
 
 
         // Open a WebSocket connection.
-        var wsUri = getWebSocketRootUri() + "/websocket-pub";
+        let wsUri = getWebSocketRootUri() + "/websocket-pub";
         websocket = new WebSocket(wsUri);
 
         // Connected to server
@@ -72,7 +72,7 @@
                 return;
             }
 
-            var msgClass = "";
+            let msgClass = "";
             if (ev.data.match("^INT:")) {
                 msgClass = "debug";
             } else if (ev.data.match("^INJ:")) {
@@ -81,18 +81,18 @@
                 msgClass = "sent";
             }
 
-            var msg = $('<div>').addClass("inputdata " + msgClass).text(ev.data);
+            let msg = $('<div>').addClass("inputdata " + msgClass).text(ev.data);
             $('#input').append(msg);
 
             // use received status (json) to update the controls to reflect the current state
-            var indexAcc = ev.data.indexOf('{');
+            let indexAcc = ev.data.indexOf('{');
             if (indexAcc >= 0) {
-                var jsonData = ev.data.substring(indexAcc);
-                var json = $.parseJSON(jsonData);
+                let jsonData = ev.data.substring(indexAcc);
+                let json = $.parseJSON(jsonData);
                 if ('STATUS' === json.type && json.status) {
-                    var status = json.status;
+                    let status = json.status;
                     if (status.effect) {
-                        var effectNo = effectToInt(json.status.effect);
+                        let effectNo = effectToInt(json.status.effect);
                         $(".current-effect").removeClass("current-effect");
                         $("#" + effectNo).addClass("current-effect");
                     }
@@ -137,10 +137,10 @@
     });
 
     function dimSwitchChangeHandler() {
-        var dimObj = $("#dim");
+        let dimObj = $("#dim");
         if ( $("#manual-dim").val() === 'on') {
             dimObj.slider('enable');
-            var value = dimObj.val();
+            let value = dimObj.val();
             $.get('/rest/api/dim/' + value);
         } else {
             dimObj.slider('disable');
@@ -149,12 +149,12 @@
     }
 
     function dimChangeHandler() {
-        var value = $("#dim").val();
+        let value = $("#dim").val();
         $.get('/rest/api/dim/' + value);
     }
 
     function effectChangeHandler(event) {
-        var effectId = event.currentTarget.id;
+        let effectId = event.currentTarget.id;
         $.get('/rest/api/effect/' + effectId);
         $(".current-effect").removeClass("current-effect");
         event.currentTarget.classList.add("current-effect");
@@ -174,18 +174,18 @@
     }
 
     function scrollToBottom() {
-        var inputObj = $("#input");
-        var scrollHeight = inputObj.prop("scrollHeight");
+        let inputObj = $("#input");
+        let scrollHeight = inputObj.prop("scrollHeight");
         //$('#input').scrollTop(scrollHeight);
         inputObj.animate({scrollTop: scrollHeight}, 150);
     }
 
     function isStickingToBottom() {
-        var inputObj =  $("#input");
-        var scrollHeight = inputObj.prop("scrollHeight");
-        var innerHeight = inputObj.innerHeight();
-        var scrollMaxPos = scrollHeight - innerHeight;
-        var scrollPos = inputObj.scrollTop();
+        let inputObj =  $("#input");
+        let scrollHeight = inputObj.prop("scrollHeight");
+        let innerHeight = inputObj.innerHeight();
+        let scrollMaxPos = scrollHeight - innerHeight;
+        let scrollPos = inputObj.scrollTop();
         return (scrollMaxPos - scrollPos) < 25;
     }
 
@@ -235,6 +235,7 @@
             </tr>
             <tr>
                 <td colspan="3">
+                    <label for="dim" class="ui-hidden-accessible">Brightness:</label>
                     <input type="range" name="dim" id="dim" value="50" min="1" max="255" data-highlight="true" disabled="disabled">
                 </td>
             </tr>
