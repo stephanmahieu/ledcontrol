@@ -31,6 +31,7 @@ $(document).ready(function(){
         $.get("/rest/api/debug/false");
     });
 
+    $('#uploadform').on('submit', uploadHandler);
 
     // Open a WebSocket connection.
     let wsUri = getWebSocketRootUri() + "/websocket-pub";
@@ -191,4 +192,19 @@ function effectToInt(name) {
         case "Ripple": return 12;
         default: return 1;
     }
+}
+
+function uploadHandler(event) {
+    // use a js handler to prevent page reload after submit
+    $.ajax( {
+        url: '/rest/api/upload',
+        type: 'POST',
+        data: new FormData(this),
+        processData: false,
+        contentType: false,
+        success: function(result){
+            console.log(result);
+        }
+    } );
+    event.preventDefault();
 }

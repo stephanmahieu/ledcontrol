@@ -7,4 +7,5 @@
     <bean id="serialDataSender" class="ledcontrol.serialcomm.processor.SerialDataSender"/>
     <bean id="serialTextProcessor" class="ledcontrol.serialcomm.processor.SerialTextProcessor"/>
     <bean id="serialDataLogger" class="ledcontrol.serialcomm.processor.SerialDataLogger"/>
+    <bean id="uploadService" class="ledcontrol.serialcomm.processor.UploadService"/>
 </beans>

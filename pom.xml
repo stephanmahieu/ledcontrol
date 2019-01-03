@@ -25,6 +25,7 @@
         <springframework.version>5.1.3.RELEASE</springframework.version>
         <apache.camel.version>2.23.0</apache.camel.version>
         <rxtxcomm.version>2.2pre2</rxtxcomm.version>
+        <apache.james.version>0.7.2</apache.james.version>
         <undertow-websockets-jsr-version>2.0.16.Final</undertow-websockets-jsr-version>
     </properties>
 
@@ -130,6 +131,17 @@
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-jackson-starter</artifactId>
                 <version>${apache.camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-mail</artifactId>
+                <version>${apache.camel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.james</groupId>
+                <artifactId>apache-mime4j-core</artifactId>
+                <version>${apache.james.version}</version>
             </dependency>
 
             <!-- Spring -->

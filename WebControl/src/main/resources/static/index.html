@@ -78,6 +78,14 @@
             </div>
         </div>
 
+        <div data-role="collapsible" data-iconpos="right" style="max-width:1250px">
+            <h4>Upload new sketch</h4>
+            <form id="uploadform" enctype="multipart/form-data" action="/rest/api/upload" method="post" data-ajax="false">
+                <input type="file" name="fileupload" id="fileupload"/>
+                <input type="text" name="device" id="device"/>
+                <input type="submit" value="Upload File" name="submit">
+            </form>
+        </div>
     </div>
 
     <div data-role="footer">
