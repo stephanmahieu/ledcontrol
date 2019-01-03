@@ -51,7 +51,7 @@
             <div class="ui-block-a"><a href="#" id="12" class="ui-btn ui-btn-b ui-btn-inline ui-corner-all effect">Ripple</a></div>
         </div>
 
-        <div data-role="collapsible" data-collapsed="false" data-iconpos="right" style="max-width:1250px">
+        <div data-role="collapsible" data-collapsed="false" data-theme="b" data-content-theme="b" data-iconpos="right" style="max-width:1440px">
             <h4>Monitor & Control</h4>
 
             <!-- 3 column grid (ui-grid-b) -->
@@ -61,7 +61,7 @@
                 <div class="ui-block-c"><a href="#" id="command" class="ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-action">Send command</a></div>
             </div>
 
-            <div class="ui-grid-solo" style="max-width:1200px">
+            <div class="ui-grid-solo">
                 <div class="ui-block-a">
                     <div id="input-container">
                         <div id="input-header">
@@ -73,12 +73,12 @@
             </div>
 
             <div class="ui-grid-a ui-responsive" style="max-width:300px">
-                <div class="ui-block-a"><a href="#" id="debugOn"  class="ui-btn ui-btn-a ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-tag">Debug On</a></div>
-                <div class="ui-block-b"><a href="#" id="debugOff" class="ui-btn ui-btn-a ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-forbidden">Debug Off</a></div>
+                <div class="ui-block-a"><a href="#" id="debugOn"  class="ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-tag">Debug On</a></div>
+                <div class="ui-block-b"><a href="#" id="debugOff" class="ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-forbidden">Debug Off</a></div>
             </div>
         </div>
 
-        <div data-role="collapsible" data-iconpos="right" style="max-width:1250px">
+        <div data-role="collapsible" data-theme="b" data-content-theme="b" data-iconpos="right" style="max-width:1440px">
             <h4>Upload new sketch</h4>
             <form id="uploadform" enctype="multipart/form-data" action="/rest/api/upload" method="post" data-ajax="false">
                 <input type="file" name="fileupload" id="fileupload"/>
