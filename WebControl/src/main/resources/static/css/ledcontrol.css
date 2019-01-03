@@ -61,20 +61,22 @@
 	color: #b1ff00 !important;
 }
 
-/* custom flipswitch labels */
-#flipswitchWrapper .ui-flipswitch {
-	width: 200px;
+/* Custom width and indentations because they differ from the standard labels */
+.custom-size-flipswitch.ui-flipswitch .ui-btn.ui-flipswitch-on {
+	text-indent: -9.9em;
 }
-#flipswitchWrapper .ui-flipswitch-active {
-	padding-left: 0;
+.custom-size-flipswitch.ui-flipswitch .ui-flipswitch-off {
+	text-indent: 0.5em;
 }
-#flipswitchWrapper .ui-flipswitch .ui-flipswitch-on, #flipswitchWrapper .ui-flipswitch.ui-flipswitch-active .ui-flipswitch-on {
-	text-indent: -20em;
+.custom-size-flipswitch.ui-flipswitch {
+	width: 12.875em;
 }
-#flipswitchWrapper .ui-flipswitch.ui-flipswitch-active .ui-flipswitch-on {
-	margin-left: 170px;
-	text-indent: -10em;
+.custom-size-flipswitch.ui-flipswitch.ui-flipswitch-active {
+	padding-left: 11em;
+	width: 1.875em;
 }
-#flipswitchWrapper .ui-flipswitch .ui-flipswitch-off {
-	text-indent: .5em;
+@media (min-width: 28em) {
+	.ui-field-contain > label + .custom-size-flipswitch.ui-flipswitch {
+		width: 1.875em;
+	}
 }
