@@ -8,7 +8,7 @@ $(document).ready(function(){
     dimObj.on("slidestop vclick", dimChangeHandler);
 
     // set initial state flipswitch to off
-    dimSwitchObj.attr('checked',false).flipswitch('refresh');
+    dimSwitchObj.prop('checked', false).flipswitch('refresh');
 
     dimSwitchObj.on("change", dimSwitchChangeHandler);
 
@@ -98,7 +98,7 @@ $(document).ready(function(){
                         // prevent triggering the changehandler and send a command!
                         dimSwitchObj
                             .off("change")
-                            .attr('checked',true).flipswitch('refresh')
+                            .prop('checked',true).flipswitch('refresh')
                             .on("change", dimSwitchChangeHandler);
                     }
                     dimObj.slider('enable');
@@ -108,7 +108,7 @@ $(document).ready(function(){
                         // prevent triggering the changehandler and send a command!
                         dimSwitchObj
                             .off("change")
-                            .attr('checked',false).flipswitch('refresh')
+                            .prop('checked',false).flipswitch('refresh')
                             .on("change", dimSwitchChangeHandler);
                     }
                     dimObj.slider('disable');
