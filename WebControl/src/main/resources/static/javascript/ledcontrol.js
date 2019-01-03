@@ -5,7 +5,7 @@ $(document).ready(function(){
     let dimSwitchObj = $("#manual-dim");
     let statusObj = $('#input-status');
 
-    dimObj.on("slidestop vclick", dimChangeHandler);
+    dimObj.on("slidestop vclick blur", dimChangeHandler);
 
     // set initial state flipswitch to off
     dimSwitchObj.prop('checked', false).flipswitch('refresh');
@@ -29,6 +29,10 @@ $(document).ready(function(){
 
     $("#debugOff").click(function(event) {
         $.get("/rest/api/debug/false");
+    });
+
+    $("#clear").click(function(event) {
+        $('#input').text("");
     });
 
     $('#uploadform').on('submit', uploadHandler);
@@ -87,9 +91,9 @@ $(document).ready(function(){
                     if (dimObj.val() !== status.brightness) {
                         // prevent triggering the changehandler and send a dim command!
                         dimObj
-                            .off('slidestop vclick')
+                            .off('slidestop vclick blur')
                             .val(status.brightness).slider("refresh")
-                            .on('slidestop vclick', dimChangeHandler);
+                            .on('slidestop vclick blur', dimChangeHandler);
                     }
                 }
                 if (status.autoBrightness === false) {
