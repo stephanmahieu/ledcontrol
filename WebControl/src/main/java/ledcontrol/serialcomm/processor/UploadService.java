@@ -10,6 +10,7 @@ import javax.activation.DataHandler;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
@@ -46,29 +47,35 @@ public class UploadService {
         LOG.info("Processing uploaded file for device [{}] on COM port [{}]...", device, comport);
 
         // save submitted file attachment
-        final Path tempFile = saveAttachment(exchange);
+        final Path uploadedFile = saveAttachment(exchange);
 
-        websocketLog.sendBody("File uploaded successfully: " + tempFile.getParent().toString() + File.separator + tempFile.getFileName().toString());
+        websocketLog.sendBody("File uploaded successfully: " + uploadedFile.getParent() + File.separator + uploadedFile.getFileName());
 
         LOG.info("Stopping serial USB connection...");
         String status = performActionOnRoute(exchange, ACTION_SUSPEND);
 
         websocketLog.sendBody("Normal serial communication is  " + status);
 
-        if ("Stopped".equals(status)) {
+        if ("Suspended".equals(status)) {
 
             // TODO run avrdude command to upload the new sketch
             websocketLog.sendBody("Uploading sketch to Arduino ("+ device + ") via USB-port " + comport + "...");
-            sleep(2000);
+            sleep(4000);
+
+
+
+            // remove the temporary file
+            Files.delete(uploadedFile);
+            websocketLog.sendBody("Uploaded File removed");
 
             status = performActionOnRoute(exchange, ACTION_RESUME);
             websocketLog.sendBody("Normal serial communication is  " + status);
 
             // restore communication by sending status requests, helps flushing the buffers
-            sleep(1000);
-            sendStatusRequest.sendBody(null);
-            sleep(1000);
-            sendStatusRequest.sendBody(null);
+            sleep(500);
+            sendStatusRequest();
+            sleep(500);
+            sendStatusRequest();
         }
 
         return "";
@@ -88,6 +95,10 @@ public class UploadService {
         return producer.requestBody(CONTROL_BUS + "&action=" + ACTION_STATUS, null, String.class);
     }
 
+    private void sendStatusRequest() {
+        sendStatusRequest.sendBody(null);
+    }
+
 
     private Path saveAttachment(Exchange exchange) throws MessagingException, IOException {
         final String contentDisposition = (String) exchange.getIn().getHeader("Content-Disposition");
@@ -99,11 +110,12 @@ public class UploadService {
 
         LOG.info("Handle upload for file [{}] with size [{}] and contentDisposition [{}] ...", filename, fileSize, contentDisposition);
 
-        Path tempFile = Files.createTempFile(filename + "_", ".tmp");
-        Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        final String tempDir = System.getProperty("java.io.tmpdir");
+        final Path binFile = Paths.get(tempDir, filename);
+        Files.copy(inputStream, binFile, StandardCopyOption.REPLACE_EXISTING);
 
-        LOG.info("File uploaded as [{}] in directory [{}]", tempFile.getFileName().toString(), tempFile.getParent().toString());
-        return tempFile;
+        LOG.info("File uploaded as [{}] in directory [{}]", binFile.getFileName().toString(), binFile.getParent().toString());
+        return binFile;
     }
 
     /**
