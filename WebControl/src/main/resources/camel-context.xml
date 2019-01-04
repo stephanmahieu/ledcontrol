@@ -75,12 +75,10 @@
                 </route>
             </get>
             
-            <post uri="/upload" consumes="multipart/form-data" produces="application/json" >
+            <post uri="/upload/{comport}/{device}" consumes="multipart/form-data" produces="application/json" >
                 <route>
                     <unmarshal ref="multipartMime"/>
 
-                    <!-- process attachment(s) -->
-                    <!--<to uri="bean:uploadService?method=handleUpload(${exchange})"/>-->
                     <bean ref="uploadService"/>
 
                     <!-- set okay response -->
@@ -132,6 +130,11 @@
         <route id="initSerial">
             <!-- Fire twice after 3 seconds -->
             <from uri="timer://foo?repeatCount=2&amp;period=1500&amp;delay=3000"/>
+            <to uri="direct:sendStatusRequest"/>
+        </route>
+
+        <route id="sendStatusRequest">
+            <from uri="direct:sendStatusRequest"/>
             <transform>
                 <simple>{"type":"STATUS"}\n</simple>
             </transform>

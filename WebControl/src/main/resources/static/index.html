@@ -82,9 +82,34 @@
         <div data-role="collapsible" data-theme="b" data-content-theme="b" data-iconpos="right" style="max-width:1440px">
             <h4>Upload new sketch</h4>
             <form id="uploadform" enctype="multipart/form-data" action="/rest/api/upload" method="post" data-ajax="false">
-                <input type="file" name="fileupload" id="fileupload"/>
-                <input type="text" name="device" id="device"/>
-                <input type="submit" value="Upload File" name="submit">
+                <div class="ui-grid-c ui-responsive">
+                    <div class="ui-block-a">
+                        <input type="file" name="fileupload" id="fileupload"/>
+                    </div>
+                    <div class="ui-block-b">
+                        <select id="device">
+                            <option value="atmega2560">Arduino Mega 2560</option>
+                            <option value="atmega328p">Arduino Pro Mini</option>
+                        </select>
+                    </div>
+                    <div class="ui-block-c">
+                        <select id="comport">
+                            <option value="COM1">COM1</option>
+                            <option value="COM2">COM2</option>
+                            <option value="COM3">COM3</option>
+                            <option value="COM4">COM4</option>
+                            <option value="COM5">COM5</option>
+                            <option value="COM6">COM6</option>
+                            <option value="/dev/ttyACM0">ttyACM0</option>
+                            <option value="/dev/ttyACM1">ttyACM1</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ui-grid-solo">
+                    <div class="ui-block-a">
+                        <input type="submit" value="Upload File" name="submit" data-inline="true" data-icon="arrow-u">
+                    </div>
+                </div>
             </form>
         </div>
     </div>

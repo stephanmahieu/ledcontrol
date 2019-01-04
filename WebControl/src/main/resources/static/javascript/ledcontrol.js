@@ -200,8 +200,11 @@ function effectToInt(name) {
 
 function uploadHandler(event) {
     // use a js handler to prevent page reload after submit
+    let device = $('#device').val();
+    let comport = $('#comport').val();
+
     $.ajax( {
-        url: '/rest/api/upload',
+        url: '/rest/api/upload/' + escapeForwardSlash(comport) + '/' + device,
         type: 'POST',
         data: new FormData(this),
         processData: false,
@@ -211,4 +214,8 @@ function uploadHandler(event) {
         }
     } );
     event.preventDefault();
+}
+
+function escapeForwardSlash(str) {
+    return str.replace(/\//g, '_');
 }

@@ -22,19 +22,75 @@ import javax.mail.internet.MimeBodyPart;
 public class UploadService {
     private static final Logger LOG = LoggerFactory.getLogger(UploadService.class);
 
+    private static final String SERIAL_ROUTE_ID = "receiveSerial";
+    private static final String CONTROL_BUS = "controlbus:route?routeId=" + SERIAL_ROUTE_ID;
+
+    private static final String ACTION_SUSPEND = "suspend";
+    private static final String ACTION_RESUME = "resume";
+    private static final String ACTION_STATUS = "status";
+
     private static final int BUFFER_SIZE = 1024 * 16;
 
     @EndpointInject(uri = "direct:sendWebsocketData")
     private ProducerTemplate websocketLog;
 
+    @EndpointInject(uri = "direct:sendStatusRequest")
+    private ProducerTemplate sendStatusRequest;
+
 
     public String handleUpload(final Exchange exchange) throws Exception {
-        LOG.info("Processing uploaded file...");
+        // get path parameters
+        final String comport = ((String) exchange.getIn().getHeader("comport")).replaceAll("_", "/");
+        final String device = (String) exchange.getIn().getHeader("device");
 
+        LOG.info("Processing uploaded file for device [{}] on COM port [{}]...", device, comport);
+
+        // save submitted file attachment
+        final Path tempFile = saveAttachment(exchange);
+
+        websocketLog.sendBody("File uploaded successfully: " + tempFile.getParent().toString() + File.separator + tempFile.getFileName().toString());
+
+        LOG.info("Stopping serial USB connection...");
+        String status = performActionOnRoute(exchange, ACTION_SUSPEND);
+
+        websocketLog.sendBody("Normal serial communication is  " + status);
+
+        if ("Stopped".equals(status)) {
+
+            // TODO run avrdude command to upload the new sketch
+            websocketLog.sendBody("Uploading sketch to Arduino ("+ device + ") via USB-port " + comport + "...");
+            sleep(2000);
+
+            status = performActionOnRoute(exchange, ACTION_RESUME);
+            websocketLog.sendBody("Normal serial communication is  " + status);
+
+            // restore communication by sending status requests, helps flushing the buffers
+            sleep(1000);
+            sendStatusRequest.sendBody(null);
+            sleep(1000);
+            sendStatusRequest.sendBody(null);
+        }
+
+        return "";
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            LOG.error("Sleep failure", e);
+        }
+    }
+
+    private String performActionOnRoute(final Exchange exchange, final String action) {
+        final ProducerTemplate producer = exchange.getContext().createProducerTemplate();
+        producer.sendBody(CONTROL_BUS + "&action=" + action, null);
+        return producer.requestBody(CONTROL_BUS + "&action=" + ACTION_STATUS, null, String.class);
+    }
+
+
+    private Path saveAttachment(Exchange exchange) throws MessagingException, IOException {
         final String contentDisposition = (String) exchange.getIn().getHeader("Content-Disposition");
-
-        // TODO get additional submitted fields like device
-        //final String device =
 
         final String filename = getFieldFromContentDisposition(contentDisposition, "filename");
         final String fileSize = (String) exchange.getIn().getHeader("Content-Length");
@@ -47,10 +103,7 @@ public class UploadService {
         Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
         LOG.info("File uploaded as [{}] in directory [{}]", tempFile.getFileName().toString(), tempFile.getParent().toString());
-
-        websocketLog.sendBody("File uploaded successfully: " + tempFile.getParent().toString() + File.separator + tempFile.getFileName().toString());
-
-        return "";
+        return tempFile;
     }
 
     /**
@@ -90,5 +143,4 @@ public class UploadService {
 
         return exchange.getIn().getBody(InputStream.class);
     }
-
 }
