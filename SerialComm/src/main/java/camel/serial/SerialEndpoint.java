@@ -31,10 +31,14 @@ public class SerialEndpoint extends DefaultEndpoint {
 
 	private SerialConfiguration config;
 
+	private CommPortIdentifier portIdentifier;
+
 	private SerialPort serialPort;
 	private InputStream in;
 	private OutputStream out;
 
+	private SerialConsumer consumer = null;
+	private SerialProducer producer = null;
 
 	public SerialEndpoint(String endPointUri, Component component, SerialConfiguration config) {
 		super(endPointUri, component);
@@ -49,12 +53,14 @@ public class SerialEndpoint extends DefaultEndpoint {
 
 	@Override
 	public Consumer createConsumer(Processor processor) {
-		return new SerialConsumer(this, processor, serialPort, in);
+		consumer = new SerialConsumer(this, processor, serialPort, in);
+		return consumer;
 	}
 
 	@Override
 	public Producer createProducer() {
-		return new SerialProducer(this, out);
+		producer = new SerialProducer(this, out);
+		return producer;
 	}
 
 	@Override
@@ -107,29 +113,13 @@ public class SerialEndpoint extends DefaultEndpoint {
 			LOG.info("Attempting to connect to port {}...", portName);
 
 			try {
-				CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+				portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 
 				if (portIdentifier.isCurrentlyOwned()) {
 					throw new PortInUseException();
 				}
 				else {
-					CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
-
-					if (commPort instanceof SerialPort) {
-						serialPort = (SerialPort) commPort;
-
-						LOG.info("Setting serial port parameters: baudrate:{} databits:{} stopbits:{} parity:{}",
-								new Object[]{config.getBaudrate(), config.getDatabits(), config.getStopbits(), config.getParity()});
-
-						serialPort.setSerialPortParams(
-								config.getBaudrate(), config.getDatabits(), config.getStopbits(), config.getParity());
-
-						in = new DataInputStream(serialPort.getInputStream());
-						out = new DataOutputStream(serialPort.getOutputStream());
-
-					} else {
-						throw new IllegalArgumentException("Port " + config.getPortName() + " is not a serial port!");
-					}
+					connect();
 				}
 			}
 			catch(NoSuchPortException e) {
@@ -148,7 +138,49 @@ public class SerialEndpoint extends DefaultEndpoint {
 			}
 		}
 
-		// TODO: close serialPort en streams
+		// TODO: close serialPort and streams
+	}
+
+	private void connect() throws Exception {
+		CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
+
+		if (commPort instanceof SerialPort) {
+			serialPort = (SerialPort) commPort;
+
+			LOG.info("Setting serial port parameters: baudrate:{} databits:{} stopbits:{} parity:{}",
+					new Object[]{config.getBaudrate(), config.getDatabits(), config.getStopbits(), config.getParity()});
+
+			serialPort.setSerialPortParams(
+					config.getBaudrate(), config.getDatabits(), config.getStopbits(), config.getParity());
+
+			in = new DataInputStream(serialPort.getInputStream());
+			out = new DataOutputStream(serialPort.getOutputStream());
+		} else {
+			throw new IllegalArgumentException("Port " + config.getPortName() + " is not a serial port!");
+		}
+	}
+
+	private void disconnect() throws Exception {
+		in.close();
+		out.close();
+		serialPort.close();
+	}
+
+	protected void serialSuspend() throws Exception {
+		disconnect();
+	}
+
+	protected void serialResume() throws Exception {
+		connect();
+
+		if (consumer != null) {
+			consumer.setIn(in);
+		}
+
+		if (producer != null) {
+			consumer.setSerialPort(serialPort);
+			producer.setOut(out);
+		}
 	}
 
 	private void showAvailablePorts() {

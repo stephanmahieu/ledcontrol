@@ -1,17 +1,16 @@
 package camel.serial;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.Suspendable;
 import org.apache.camel.impl.DefaultProducer;
 import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class SerialProducer extends DefaultProducer {
+public class SerialProducer extends DefaultProducer implements Suspendable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SerialProducer.class);
 
@@ -20,12 +19,12 @@ public class SerialProducer extends DefaultProducer {
     private static final byte[] TIMESLOT_REQUEST = {0x1};
 
     private OutputStream out;
-    //private Endpoint endpoint;
+    private SerialEndpoint endpoint;
     
 
-    public SerialProducer(Endpoint endpoint, OutputStream out) {
+    public SerialProducer(SerialEndpoint endpoint, OutputStream out) {
         super(endpoint);
-        //this.endpoint = endpoint;
+        this.endpoint = endpoint;
         this.out = out;
     }
 
@@ -86,6 +85,32 @@ public class SerialProducer extends DefaultProducer {
 //			LOG.error("Error stopping endpoint", e);
 //		}
 //	}
+
+    @Override
+    protected void doSuspend() {
+        LOG.debug("Suspend SerialProducer...");
+        try {
+            endpoint.serialSuspend();
+            super.doSuspend();
+        } catch (Exception e) {
+            LOG.error("Error suspending SerialProducer", e);
+        }
+    }
+
+    @Override
+    protected void doResume() {
+        LOG.debug("Resume SerialProducer...");
+        try {
+            endpoint.serialResume();
+            super.doResume();
+        } catch (Exception e) {
+            LOG.error("Error resuming SerialProducer", e);
+        }
+    }
+
+    protected void setOut(OutputStream out) {
+        this.out = out;
+    }
 
     @Override
     public String toString() {

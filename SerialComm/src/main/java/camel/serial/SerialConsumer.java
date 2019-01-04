@@ -10,9 +10,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.TooManyListenersException;
 
-import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.Suspendable;
 import org.apache.camel.impl.DefaultConsumer;
 import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
@@ -23,18 +23,18 @@ import org.slf4j.LoggerFactory;
  * Consumer starting a serial consumer which forwards data to the ledcontrol.processor.
  * 
  */
-public class SerialConsumer extends DefaultConsumer implements SerialPortEventListener {
+public class SerialConsumer extends DefaultConsumer implements SerialPortEventListener, Suspendable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SerialConsumer.class);
     
     private InputStream in;
     private SerialPort serialPort;
-    //private Endpoint endpoint;
+    private SerialEndpoint endpoint;
 
     
-    public SerialConsumer(Endpoint endpoint, Processor processor, SerialPort serialPort, InputStream in) {
+    public SerialConsumer(SerialEndpoint endpoint, Processor processor, SerialPort serialPort, InputStream in) {
         super(endpoint, processor);
-        //this.endpoint = endpoint;
+        this.endpoint = endpoint;
         this.serialPort = serialPort;
         this.in = in;
     }
@@ -64,10 +64,11 @@ public class SerialConsumer extends DefaultConsumer implements SerialPortEventLi
 
 //    @Override
 //    protected void doStop() {
+//        LOG.debug("Stop SerialConsumer...");
 //        try {
-//			super.doStop();
+//            super.doStop();
 //		} catch (Exception e) {
-//			LOG.error("Error stopping Serial consumer", e);
+//			LOG.error("Error stopping SerialConsumer", e);
 //		}
 //        
 //        if (serialPort != null) {
@@ -92,7 +93,44 @@ public class SerialConsumer extends DefaultConsumer implements SerialPortEventLi
 //			LOG.error("Error stopping endpoint", e);
 //		}
 //    }
-    
+
+    @Override
+    protected void doSuspend() {
+        LOG.debug("Suspend SerialConsumer...");
+        try {
+            serialPort.notifyOnDataAvailable(false);
+            serialPort.removeEventListener();
+
+            endpoint.serialSuspend();
+            super.doSuspend();
+        } catch (Exception e) {
+            LOG.error("Error suspending SerialConsumer", e);
+        }
+    }
+
+    @Override
+    protected void doResume() {
+        LOG.debug("Resume SerialConsumer...");
+        try {
+            endpoint.serialResume();
+
+            serialPort.addEventListener(this);
+            serialPort.notifyOnDataAvailable(true);
+
+            super.doResume();
+        } catch (Exception e) {
+            LOG.error("Error resuming SerialConsumer", e);
+        }
+    }
+
+    protected void setIn(InputStream in) {
+        this.in = in;
+    }
+
+    protected void setSerialPort(SerialPort serialPort) {
+        this.serialPort = serialPort;
+    }
+
     /* (non-Javadoc)
      * @see gnu.io.SerialPortEventListener#serialEvent(gnu.io.SerialPortEvent)
      */
