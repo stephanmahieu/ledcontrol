@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.ContentType;
@@ -38,6 +39,9 @@ public class UploadService {
     @EndpointInject(uri = "direct:sendStatusRequest")
     private ProducerTemplate sendStatusRequest;
 
+    @Autowired
+    private AvrdudeRunner avrdudeRunner;
+
 
     public String handleUpload(final Exchange exchange) throws Exception {
         // get path parameters
@@ -60,9 +64,11 @@ public class UploadService {
 
             // TODO run avrdude command to upload the new sketch
             websocketLog.sendBody("Uploading sketch to Arduino ("+ device + ") via USB-port " + comport + "...");
+
+            avrdudeRunner.runAvrdude();
+
+            // wait a few seconds for all output to arrive
             sleep(4000);
-
-
 
             // remove the temporary file
             Files.delete(uploadedFile);
