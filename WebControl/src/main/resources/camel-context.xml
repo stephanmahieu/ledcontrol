@@ -135,18 +135,14 @@
 
         <route id="sendStatusRequest">
             <from uri="direct:sendStatusRequest"/>
-            <transform>
-                <simple>{"type":"STATUS"}\n</simple>
-            </transform>
-            <to ref="dataOutLogger" pattern="OutOnly"/>
-            <to ref="serialComm" pattern="OutOnly"/>
+            <bean ref="serialDataSender" method="sendStatusRequest"/>
         </route>
 
         <route id="sendSerial" streamCache="true">
             <from uri="direct:sendSerialData"/>
             <marshal ref="jack"/>
 
-            <!-- Send to websocket for monitoring purpose -->
+            <!-- Send also to websocket for monitoring purpose -->
             <wireTap uri="websocketPub" pattern="OutOnly">
                 <body>
                     <simple>OUT: [${date:now:yyyyMMdd-HHmmss}] ${body}</simple>
