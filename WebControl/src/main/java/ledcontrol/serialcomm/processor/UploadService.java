@@ -78,9 +78,9 @@ public class UploadService {
             websocketLog.sendBody("Normal serial communication is  " + status);
 
             // restore communication by sending status requests, helps flushing the buffers
-            sleep(500);
+            sleep(1000);
             sendStatusRequest();
-            sleep(500);
+            sleep(1000);
             sendStatusRequest();
         }
 
