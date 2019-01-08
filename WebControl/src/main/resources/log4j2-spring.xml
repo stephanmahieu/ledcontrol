@@ -3,7 +3,7 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
+            <PatternLayout pattern="%style{%d{ISO8601}}{white} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
         </Console>
 
         <RollingFile name="RollingFile"
@@ -29,6 +29,9 @@
 
         <!-- log "ledcontrol*" at TRACE level -->
         <Logger name="ledcontrol" level="trace"></Logger>
+
+        <!-- log "camel.serial*" at DEBUG level -->
+        <Logger name="camel.serial" level="debug"></Logger>
     </Loggers>
 
 </Configuration>
