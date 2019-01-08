@@ -23,7 +23,7 @@
 	color: #F8FF00;
 	display: inline-block;
 	float: right;
-	font-size: 80%;
+	font-size: .9em;
 	font-variant: small-caps;
 	font-style: italic;
 	font-weight: bold;
@@ -41,8 +41,10 @@
 
 .inputdata {
 	font-family: monospace;
+	font-size: .9em;
 	padding-left: 6px;
 	word-break: break-all;
+	margin: 0;
 }
 
 .debug {
@@ -55,6 +57,16 @@
 
 .received {
 	color: #F5F40A;
+}
+
+.stdout {
+	color: #25ffe4;
+	margin-left: 4px;
+}
+
+.stderr {
+	color: #ff0000;
+	margin-left: 4px;
 }
 
 .current-effect {
