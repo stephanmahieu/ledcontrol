@@ -68,7 +68,7 @@ public class UploadService {
             avrdudeRunner.runAvrdude();
 
             // wait a few seconds for all output to arrive
-            sleep(4000);
+            sleep(2000);
 
             // remove the temporary file
             Files.delete(uploadedFile);
