@@ -1,9 +1,7 @@
+const WEBSOCKET_URI = "ws://" + (document.location.hostname === "" ? "localhost" : document.location.hostname) + ":9292/websocket-pub";
 let websocket;
-let wsConnectAttempt = 0;
 
-function getWebSocketUri() {
-    return "ws://" + (document.location.hostname === "" ? "localhost" : document.location.hostname) + ":9292/websocket-pub";
-}
+let isDebugOn = false;
 
 $(document).ready(function(){
     let dimObj = $("#dim");
@@ -20,19 +18,23 @@ $(document).ready(function(){
 
     // status / reset
     $(".common").click(function(event) {
-        $.get("/rest/api/" + event.currentTarget.id);
+        restAPI(event.currentTarget.id);
     });
 
     $("#command").click(function(event) {
-        $.get("/rest/api/command/" + 'Hello-world!');
+        restAPI('command/Hello-world!');
     });
 
     $("#debugOn").click(function(event) {
-        $.get("/rest/api/debug/true");
+        restAPI('debug/true');
+        websocket.debug = true;
+        isDebugOn = true;
     });
 
     $("#debugOff").click(function(event) {
-        $.get("/rest/api/debug/false");
+        restAPI('debug/false');
+        websocket.debug = false;
+        isDebugOn = false;
     });
 
     $("#clear").click(function(event) {
@@ -41,7 +43,7 @@ $(document).ready(function(){
 
     $("#connect").click(function(event) {
         if (!$('#connect').hasClass('ui-state-disabled')) {
-            connectWebSocket();
+            reconnectWebSocket();
         }
     });
 
@@ -52,72 +54,94 @@ $(document).ready(function(){
 
 });
 
+function restAPI(path) {
+    restAPIWithCallback(path, null);
+}
+
+function restAPIWithCallback(path, successCallback) {
+    $.ajax({
+        url: '/rest/api/' + path,
+        timeout: 10000,
+        success: successCallback
+    });
+}
+
 function dimSwitchChangeHandler() {
     let dimObj = $("#dim");
     if ( $("#manual-dim").is(':checked')) {
         dimObj.slider('enable');
         let value = dimObj.val();
-        $.get('/rest/api/dim/' + value);
+        restAPI('dim/' + value);
     } else {
         dimObj.slider('disable');
-        $.get('/rest/api/dim/' + "auto");
+        restAPI('dim/' + 'auto');
     }
 }
 
 function dimChangeHandler() {
     let value = $("#dim").val();
-    $.get('/rest/api/dim/' + value);
+    restAPI('dim/' + value);
 }
 
 function effectChangeHandler(event) {
     let effectId = event.currentTarget.id;
-    $.get('/rest/api/effect/' + effectId);
-    $(".current-effect").removeClass("current-effect");
-    event.currentTarget.classList.add("current-effect");
+    restAPIWithCallback('effect/' + effectId, function() {
+        $(".current-effect").removeClass("current-effect");
+        event.currentTarget.classList.add("current-effect");
+    });
 }
 
 function connectWebSocket() {
-    // if (websocket && websocket.readyState === WebSocket.OPEN) {
-    //     // close so we can reconnect
-    //     websocket.close();
-    // }
-
     // Open a WebSocket connection.
-    try {
-        websocket = new WebSocket(getWebSocketUri());
+    // websocket = new WebSocket(WEBSOCKET_URI);
+    websocket = new ReconnectingWebSocket(WEBSOCKET_URI, null, {
+        debug: false,
+        reconnectInterval: 3000,
+        maxReconnectInterval: 5 * 60 * 1000,
+        reconnectDecay: 1.5,
+        timeoutInterval: 5000,
+        maxReconnectAttempts: 50
+    });
 
-        // Connected to server
-        websocket.onopen = function(ev) {
-            $('#input-status').text('Connected to server');
-            $('#connect').addClass('ui-state-disabled');
-            // resetWsTimeout();
-        };
+    // Connected to server
+    websocket.onopen = function(ev) {
+        $('#input-status').text('Connected to server');
+        $('#connect').addClass('ui-state-disabled');
+    };
 
-        // Connection close
-        websocket.onclose = function(ev) {
-            $('#input-status').text('Disconnected from server');
-            $('#connect').removeClass('ui-state-disabled');
-            websocket = null;
-            // resetWsTimeout();
-            // verifyAutoReconnectWebsocket();
-        };
+    // Connection close
+    websocket.onclose = function(ev) {
+        $('#input-status').text('Disconnected from server');
+        $('#connect').removeClass('ui-state-disabled');
+    };
 
-        // Error
-        websocket.onerror = function(ev) {
-            $('#input-status').text(ev.data);
-        };
+    // Connecting
+    websocket.onconnecting = function(ev) {
+        // display status briefly
+        $('#input-connect-status').text('connecting... ');
+        setTimeout(function() {
+            $('#input-connect-status').text('');
+          }, 2500
+        );
+    };
 
-        websocket.onmessage = websocketMessageHandler;
-    }
-    catch(e) {
-        // ignore
-    }
+    // Error
+    websocket.onerror = function(ev) {
+        $('#input-status').text(ev.data);
+    };
+
+    websocket.onmessage = websocketMessageHandler;
+}
+
+function reconnectWebSocket() {
+    websocket.open();
 }
 
 function websocketMessageHandler(ev) {
     // Message Received
-    if (ev.data === "keep-alive") {
-        //websocket.send("echo-alive");
+
+    if (ev.data === "keep-alive" && !isDebugOn) {
+        // websocket.send("echo-alive");
         return;
     }
 
@@ -208,56 +232,9 @@ function initControlsWithStatusInfo(statusData) {
     }
 }
 
-// function autoReconnectWebsocket() {
-//     if (websocket) {
-//         websocket.close();
-//
-//     }
-//     connectWebSocket();
-//     setTimeout(verifyAutoReconnectWebsocket, getWsTimeout());
-// }
-//
-// function verifyAutoReconnectWebsocket() {
-//     if (websocket) {
-//         switch (websocket.readyState) {
-//             case WebSocket.OPEN:
-//                  return;
-//
-//             case WebSocket.CONNECTING:
-//                  setTimeout(verifyAutoReconnectWebsocket, 1000);
-//                  break;
-//
-//             case WebSocket.CLOSED:
-//             case WebSocket.CLOSING:
-//                 setTimeout(autoReconnectWebsocket, getWsTimeout());
-//                 break;
-//         }
-//     } else {
-//         setTimeout(autoReconnectWebsocket, getWsTimeout());
-//     }
-// }
-//
-// function getWsTimeout() {
-//     wsConnectAttempt++;
-//     if (wsConnectAttempt > 50) {
-//         return 30 * 60 * 1000; // 30 min
-//     }
-//     else if (wsConnectAttempt > 20) {
-//         return 5 * 60 * 1000; // 5 min
-//     }
-//     else if (wsConnectAttempt > 10) {
-//         return 60 * 1000; // 1 min
-//     }
-//     return 5000; // 5 sec
-// }
-//
-// function resetWsTimeout() {
-//     wsConnectAttempt = 0;
-// }
-
 function scrollToBottom() {
     let inputObj = $("#input");
-    inputObj.stop().animate({"scrollTop": inputObj.prop("scrollHeight")}, 300);
+    inputObj.stop().animate({"scrollTop": inputObj.prop("scrollHeight")}, 500);
 }
 
 // function isTouchDevice() {
@@ -276,7 +253,7 @@ function scrollToBottom() {
 //     let scrollMaxPos = scrollHeight - innerHeight;
 //     let scrollPos = inputObj.scrollTop();
 //     return (scrollMaxPos - scrollPos) < 25;
-// }
+//}
 
 function effectToInt(name) {
     switch (name) {
@@ -305,6 +282,7 @@ function uploadHandler(event) {
     $.ajax( {
         url: '/rest/api/upload/' + escapeForwardSlash(comport) + '/' + device,
         type: 'POST',
+        timeout: 30000,
         data: new FormData(this),
         processData: false,
         contentType: false,

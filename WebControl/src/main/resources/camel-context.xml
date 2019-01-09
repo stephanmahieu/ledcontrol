@@ -40,43 +40,43 @@
 
         <rest path="/api" produces="application/json">
             <get uri="/dim/{value}">
-                <route>
+                <route id="restDim">
                     <bean ref="serialDataSender" method="sendCommand('brightness', ${header.value})"/>
                 </route>
             </get>
 
             <get uri="/effect/{value}">
-                <route>
+                <route id="restEffect">
                     <bean ref="serialDataSender" method="sendEffect(${header.value})"/>
                 </route>
             </get>
 
             <get uri="/status">
-                <route>
+                <route id="restStatus">
                     <bean ref="serialDataSender" method="sendStatusRequest"/>
                 </route>
             </get>
 
             <get uri="/reset">
-                <route>
+                <route id="restReset">
                     <bean ref="serialDataSender" method="sendReset"/>
                 </route>
             </get>
 
             <get uri="/debug/{boolean}">
-                <route>
+                <route id="restDebug">
                     <bean ref="serialDataSender" method="sendDebugState(${header.boolean})"/>
                 </route>
             </get>
 
             <get uri="/command/{command}">
-                <route>
+                <route id="restCommand">
                     <bean ref="serialDataSender" method="sendCommand(${header.command})"/>
                 </route>
             </get>
             
             <post uri="/upload/{comport}/{device}" consumes="multipart/form-data" produces="application/json" >
-                <route>
+                <route id="restUpload">
                     <unmarshal ref="multipartMime"/>
 
                     <bean ref="uploadService"/>
@@ -129,7 +129,7 @@
 
         <route id="initSerial">
             <!-- Fire twice after 3 seconds -->
-            <from uri="timer://foo?repeatCount=2&amp;period=1500&amp;delay=3000"/>
+            <from uri="timer://initserial?repeatCount=2&amp;period=1500&amp;delay=3000"/>
             <to uri="direct:sendStatusRequest"/>
         </route>
 
@@ -177,7 +177,7 @@
         <!-- Periodically send some data to keep the websocket connection alive -->
         <route id="keepWebsocketAlive" streamCache="false">
             <!-- Every 250 sec (default maxIdleTime Websocket Component is 300s) -->
-            <from uri="timer://foo?fixedRate=false&amp;period=250000"/>
+            <from uri="timer://keepalivetimer?period=250s&amp;delay=10s"/>
 
             <transform>
                 <simple>keep-alive</simple>

@@ -6,6 +6,7 @@
     <title>LED Control</title>
     <link rel="stylesheet" href="/css/jquery.mobile-1.4.5.min.css">
     <link rel="stylesheet" href="/css/ledcontrol.css" type="text/css">
+    <script src="/javascript/reconnecting-websocket.min.js" type="text/javascript"></script>
     <script src="/javascript/jquery-2.1.4.min.js" type="text/javascript"></script>
     <script src="/javascript/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
     <script src="/javascript/ledcontrol.js" type="text/javascript"></script>
@@ -65,7 +66,7 @@
                 <div class="ui-block-a">
                     <div id="input-container">
                         <div id="input-header">
-                            <div id="input-title">Monitor</div><div id="input-status">Not connected</div>
+                            <div id="input-title">Monitor</div><div class="monitor-status"><div id="input-connect-status"></div><div id="input-status">Not connected</div></div>
                         </div>
                         <div id="input"></div>
                     </div>
