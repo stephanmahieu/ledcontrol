@@ -61,6 +61,7 @@ function restAPI(path) {
 function restAPIWithCallback(path, successCallback) {
     $.ajax({
         url: '/rest/api/' + path,
+        contentType: 'text/plain',
         timeout: 10000,
         success: successCallback
     });
