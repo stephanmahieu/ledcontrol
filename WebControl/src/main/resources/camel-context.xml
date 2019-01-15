@@ -104,7 +104,7 @@
                     <simple>${body} regex '^\{.*'</simple>
                     <!-- if message starts with '{' its probably JSON -->
 
-                    <!-- Send to websocket for monitoring purpose -->
+                    <!-- Send to websocket for monitoring purpose, prefix with INJ: -->
                     <wireTap uri="websocketPub" pattern="OutOnly">
                         <body>
                             <simple>INJ: [${date:now:yyyyMMdd-HHmmss}] ${body}</simple>
@@ -115,7 +115,7 @@
                     <to ref="jsonProcessor" pattern="InOnly"/>
                 </when>
                 <otherwise>
-                    <!-- Send to websocket for monitoring purpose -->
+                    <!-- Send to websocket for monitoring purpose, prefix with INT: -->
                     <wireTap uri="websocketPub" pattern="OutOnly">
                         <body>
                             <simple>INT: [${date:now:yyyyMMdd-HHmmss}] ${body}</simple>
