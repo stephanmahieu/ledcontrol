@@ -22,7 +22,10 @@ import java.util.concurrent.TimeUnit;
 public class AvrdudeRunner {
     private static final Logger LOG = LoggerFactory.getLogger(AvrdudeRunner.class);
 
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().startsWith("windows");
+
     private static final long MAX_TIME_FOR_PROGRAM_TO_FINISH = 30L;
+
     private static final String[] PATHNAMES = {"Path", "PATH", "path"};
     private static final String[] AVRDUDE_NAMES = {"avrdude.exe", "avrdude"};
     private static final String[] ARDUINO_NAMES = {"arduino.exe", "arduino"};
@@ -32,21 +35,20 @@ public class AvrdudeRunner {
 
     private enum OutType {STDOUT, STDERR}
 
-
     public AvrdudeRunner() {
     }
 
     // TODO actually run avrdude
     public void runAvrdude() {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-
         ProcessBuilder pb = new ProcessBuilder();
-        String avrdudeApp = findAvrdudeApp(pb.environment());
+        Path avrdudeApp = findAvrdudeApp(pb.environment());
 
         if (avrdudeApp != null) {
-            pb.command(avrdudeApp, "-?");
+            Path avrdudeCfg = findAvrdudeCfg(avrdudeApp.getParent());
+
+            pb.command(avrdudeApp.toString(), "-?");
         } else {
-            if (isWindows) {
+            if (IS_WINDOWS) {
                 pb.command("cmd.exe", "/c", "dir /ogen");
             } else {
                 pb.command("sh", "-c", "ls -ltr");
@@ -81,7 +83,7 @@ public class AvrdudeRunner {
     }
 
 
-    private String findAvrdudeApp(Map<String, String> env) {
+    private Path findAvrdudeApp(final Map<String, String> env) {
         List<String> paths = getEnvironmentPaths(env);
 
         // find avrdude app in the environment paths
@@ -101,10 +103,27 @@ public class AvrdudeRunner {
             websocketLog.sendBody("Found avrdude location: " + avrdudeApp);
         }
 
-        return (avrdudeApp == null) ? null : avrdudeApp.toString();
+        return avrdudeApp;
     }
 
-    private List<String> getEnvironmentPaths(Map<String, String> env) {
+    private Path findAvrdudeCfg(final Path avrdudeAppDirectory) {
+        Path cfgPath = Paths.get(avrdudeAppDirectory.getParent().toString(), "etc/avrdude.conf");
+
+        if (!Files.exists(cfgPath) && !IS_WINDOWS) {
+            cfgPath = Paths.get("/etc/avrdude.conf");
+        }
+
+        if (Files.isReadable(cfgPath)) {
+            websocketLog.sendBody("Found configuration file: " + cfgPath);
+        } else {
+            websocketLog.sendBody("Avrdude configuration file not found or inaccessible (" + cfgPath + ")");
+            cfgPath = null;
+        }
+
+        return cfgPath;
+    }
+
+    private List<String> getEnvironmentPaths(final Map<String, String> env) {
         List<String> paths = new ArrayList<>();
         for (String key : PATHNAMES) {
             if (env.containsKey(key)) {
@@ -127,16 +146,16 @@ public class AvrdudeRunner {
         return paths;
     }
 
-    private Path findAvrDudeInArduinoDir(Path arduinoApp) {
+    private Path findAvrDudeInArduinoDir(final Path arduinoApp) {
         String avrdudeDir = (new File(arduinoApp.getParent().toFile(), "hardware/tools/avr/bin/")).toString();
         return findAppPath(avrdudeDir, AVRDUDE_NAMES);
     }
 
-    private Path findAppPath(final String path, String[] appNames) {
+    private Path findAppPath(final String path, final String[] appNames) {
         return findAppPath(new ArrayList<>(Arrays.asList(path)), appNames);
     }
 
-    private Path findAppPath(final List<String> paths, String[] appNames) {
+    private Path findAppPath(final List<String> paths, final String[] appNames) {
         Path foundApp = null;
         for (String directory : paths) {
 
@@ -148,8 +167,8 @@ public class AvrdudeRunner {
                         foundApp = findApp(filepath, appNames);
                     }
                 }
-            } catch  (NoSuchFileException nsf) {
-                LOG.warn("Error finding file in subdir", nsf.getMessage());
+            } catch (NoSuchFileException nsf) {
+                // ignore invalid path
             } catch (IOException e) {
                 LOG.error("Error finding file in subdir", e.getMessage());
             }
@@ -188,7 +207,7 @@ public class AvrdudeRunner {
         });
     }
 
-    private void awaitOutput(ExecutorService executor) {
+    private void awaitOutput(final ExecutorService executor) {
         try {
             executor.shutdown();
             executor.awaitTermination(MAX_TIME_FOR_PROGRAM_TO_FINISH, TimeUnit.SECONDS);
@@ -197,7 +216,7 @@ public class AvrdudeRunner {
         }
     }
 
-    private Integer awaitProgramFinish(Process process) {
+    private Integer awaitProgramFinish(final Process process) {
         Integer exitValue = null;
         try {
             if (process.waitFor(MAX_TIME_FOR_PROGRAM_TO_FINISH, TimeUnit.SECONDS)) {
