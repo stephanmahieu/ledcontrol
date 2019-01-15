@@ -153,24 +153,16 @@
             <to ref="serialComm" pattern="OutOnly"/>
         </route>
 
-
-
         <!-- route id="testSendSerial" streamCache="true">
             <from uri="timer:test?period=5seconds"/>
             <setBody>
-                < ! - - constant>{"cmd":"Hello world, this is a very large string, this okay? (testpattern: #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# abcdefghijklmnopqrstuvwxyz 01234567890))"}</constant - - >
-                <constant>{"cmd":"Hello world!"}</constant>
+                <constant>{"cmd":"Hello world, this is a very large string, this okay? (testpattern: #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# abcdefghijklmnopqrstuvwxyz 01234567890))"}</constant>
             </setBody>
             <to ref="serialComm" pattern="OutOnly"/>
         </route -->
 
         <route id="sendWebsocket" streamCache="true">
             <from uri="direct:sendWebsocketData"/>
-            <to ref="websocketPub" pattern="OutOnly"/>
-        </route>
-
-        <route id="echoWebsocket" streamCache="true">
-            <from ref="websocketPub"/>
             <to ref="websocketPub" pattern="OutOnly"/>
         </route>
 
