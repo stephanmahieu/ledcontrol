@@ -211,8 +211,8 @@ function initControlsWithStatusInfo(statusData) {
         }
     }
     if (status.autoBrightness === false) {
-        // manual == on
-        if (!dimSwitchObj.is(':checked')) {
+        // manual == on == checked
+        if (!dimSwitchObj.prop('checked')) {
             // prevent triggering the changehandler and send a command!
             dimSwitchObj
                 .off("change")
@@ -222,7 +222,7 @@ function initControlsWithStatusInfo(statusData) {
         dimObj.slider('enable');
     } else {
         // automatic == off
-        if (dimSwitchObj.is(':checked')) {
+        if (dimSwitchObj.prop('checked')) {
             // prevent triggering the changehandler and send a command!
             dimSwitchObj
                 .off("change")
