@@ -21,10 +21,8 @@
 
         <div class="ui-grid-solo" style="max-width:600px">
             <div class="ui-block-a">
-                <div id="flipswitchWrapper">
-                    <label for="manual-dim" class="ui-hidden-accessible">Brightness switch:</label>
-                    <input type="checkbox" data-role="flipswitch" id="manual-dim" data-on-text="Brightness Manual" data-off-text="Brightness Auto" data-wrapper-class="custom-size-flipswitch">
-                </div>
+                <label for="manual-dim" class="ui-hidden-accessible">Brightness switch:</label>
+                <input type="checkbox" data-role="flipswitch" id="manual-dim" data-on-text="Brightness Manual" data-off-text="Brightness Auto" data-wrapper-class="custom-size-flipswitch">
 
                 <label for="dim" class="ui-hidden-accessible">Brightness:</label>
                 <input type="range" name="dim" id="dim" value="50" min="1" max="255" data-highlight="true" disabled="disabled">
@@ -105,6 +103,12 @@
                             <option value="/dev/ttyACM0">ttyACM0</option>
                             <option value="/dev/ttyACM1">ttyACM1</option>
                         </select>
+                    </div>
+                    <div class="ui-block-d">
+                        <div class="custom-flipswitch-color-wrapper">
+                            <label for="test-sketch" class="ui-hidden-accessible">Test sketch:</label>
+                            <input type="checkbox" data-role="flipswitch" id="test-sketch" data-on-text="Test" data-off-text="Write" data-wrapper-class="big-flipswitch">
+                        </div>
                     </div>
                 </div>
                 <div class="ui-grid-solo">

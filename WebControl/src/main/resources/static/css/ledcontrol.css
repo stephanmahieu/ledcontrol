@@ -105,3 +105,25 @@
 		width: 1.875em;
 	}
 }
+
+/* Big (same height as button) red/green flipswitch */
+.big-flipswitch {
+	height: 2.6em;
+}
+.big-flipswitch.ui-flipswitch .ui-btn,
+.big-flipswitch.ui-flipswitch .ui-flipswitch-off {
+	height: 2.4em;
+	line-height: 2.3em;
+}
+.big-flipswitch.ui-flipswitch .ui-btn.ui-flipswitch-on {
+	text-indent: -3.0em;
+}
+.big-flipswitch.ui-flipswitch .ui-flipswitch-off {
+	text-indent: 0.5em;
+}
+.custom-flipswitch-color-wrapper .ui-flipswitch.ui-flipswitch-active {
+	background-color: #194119 !important;
+}
+.custom-flipswitch-color-wrapper .ui-flipswitch {
+	background-color: #631313 !important;
+}
