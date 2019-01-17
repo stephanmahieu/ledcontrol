@@ -19,6 +19,9 @@
 	font-weight: bold;
 }
 
+#theme-selector {
+	float: right;
+}
 
 .monitor-status {
 	display: inline-block;
@@ -86,7 +89,14 @@
 	color: #b1ff00 !important;
 }
 
-/* Custom width and indentations because they differ from the standard labels */
+
+/* Override active color */
+.ui-btn-active, .ui-flipswitch-active {
+	background-color: #1a6c91 !important;
+	border-color: #1a7ba1 !important;
+}
+
+/* Flipswitch with custom width and indentations to accommodate longer label */
 .custom-size-flipswitch.ui-flipswitch .ui-btn.ui-flipswitch-on {
 	text-indent: -9.9em;
 }
@@ -106,7 +116,7 @@
 	}
 }
 
-/* Big (same height as button) red/green flipswitch */
+/* Bigger height flipswitch (same height as button) */
 .big-flipswitch {
 	height: 2.6em;
 }
@@ -121,9 +131,12 @@
 .big-flipswitch.ui-flipswitch .ui-flipswitch-off {
 	text-indent: 0.5em;
 }
-.custom-flipswitch-color-wrapper .ui-flipswitch.ui-flipswitch-active {
-	background-color: #194119 !important;
-}
-.custom-flipswitch-color-wrapper .ui-flipswitch {
+
+/* red/green flipswitch */
+.redgreen-flipswitch {
 	background-color: #631313 !important;
+	color: white !important;
+}
+.redgreen-flipswitch.ui-flipswitch-active {
+	background-color: #194119 !important;
 }

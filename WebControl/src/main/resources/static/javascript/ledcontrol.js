@@ -49,6 +49,11 @@ $(document).ready(function(){
 
     $('#uploadform').on('submit', uploadHandler);
 
+    $("#theme-selector input").on( "change", function(event) {
+        let themeClass = $("#theme-selector input:checked").attr( "id" );
+        $("#ledcontrolpage").removeClass("ui-page-theme-a ui-page-theme-b").addClass("ui-page-theme-" + themeClass);
+    });
+
     // Open a WebSocket connection.
     connectWebSocket();
 
