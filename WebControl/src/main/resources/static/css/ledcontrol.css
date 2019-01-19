@@ -85,7 +85,10 @@
 	margin-left: 4px;
 }
 
-.current-effect {
+.ui-page-theme-a .current-effect {
+	color: #d42d33 !important;
+}
+.ui-page-theme-b .current-effect {
 	color: #b1ff00 !important;
 }
 
