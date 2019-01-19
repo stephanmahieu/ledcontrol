@@ -37,9 +37,9 @@ $(document).ready(function(){
 
     $('#uploadform').on('submit', uploadHandler);
 
-    $("#theme-selector input").on( "change", function(event) {
-        let themeClass = $("#theme-selector input:checked").attr( "id" );
-        $("#ledcontrolpage").removeClass("ui-page-theme-a ui-page-theme-b").addClass("ui-page-theme-" + themeClass);
+    $('#theme-selector input').on('change', function(event) {
+        let themeClass = $('#theme-selector input:checked').attr('id');
+        $('#ledcontrolpage').removeClass('ui-page-theme-a ui-page-theme-b ui-page-theme-c').addClass('ui-page-theme-' + themeClass);
     });
 
     // Open a WebSocket connection.
@@ -100,7 +100,6 @@ function debugChangeHandler(event) {
 
 function connectWebSocket() {
     // Open a WebSocket connection.
-    // websocket = new WebSocket(WEBSOCKET_URI);
     websocket = new ReconnectingWebSocket(WEBSOCKET_URI, null, {
         debug: false,
         reconnectInterval: 3000,
@@ -175,9 +174,7 @@ function websocketMessageHandler(ev) {
         initControlsWithStatusInfo(ev.data);
     }
 
-    //if (!isTouchDevice() && isStickingToBottom()) {
-        scrollToBottom();
-    //}
+    scrollToBottom();
 }
 
 function isStatusUpdateResponse(data) {
@@ -256,24 +253,6 @@ function scrollToBottom() {
     let inputObj = $("#input");
     inputObj.stop().animate({"scrollTop": inputObj.prop("scrollHeight")}, 500);
 }
-
-// function isTouchDevice() {
-//     try {
-//         document.createEvent("TouchEvent");
-//         return true;
-//     } catch(e) {
-//         return false;
-//     }
-// }
-
-// function isStickingToBottom() {
-//     let inputObj =  $("#input");
-//     let scrollHeight = inputObj.prop("scrollHeight");
-//     let innerHeight = inputObj.innerHeight();
-//     let scrollMaxPos = scrollHeight - innerHeight;
-//     let scrollPos = inputObj.scrollTop();
-//     return (scrollMaxPos - scrollPos) < 25;
-//}
 
 function effectToInt(name) {
     switch (name) {
