@@ -62,7 +62,7 @@ function restAPIWithCallback(path, successCallback) {
 
 function dimSwitchChangeHandler() {
     let dimObj = $("#dim");
-    if ( $("#manual-dim").is(':checked')) {
+    if ($("#manual-dim").prop('checked')) {
         dimObj.slider('enable');
         let value = dimObj.val();
         restAPI('dim/' + value);
