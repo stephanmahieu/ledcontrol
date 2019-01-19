@@ -37,15 +37,22 @@ $(document).ready(function(){
 
     $('#uploadform').on('submit', uploadHandler);
 
-    $('#theme-selector input').on('change', function(event) {
-        let themeClass = $('#theme-selector input:checked').attr('id');
-        $('#ledcontrolpage').removeClass('ui-page-theme-a ui-page-theme-b ui-page-theme-c').addClass('ui-page-theme-' + themeClass);
-    });
+    let themeInputs = $('#theme-selector input');
+    themeInputs.prop('checked',false);
+    $('#b').prop('checked',true);
+    themeInputs.checkboxradio("refresh").on('change', themeSelectHandler);
 
     // Open a WebSocket connection.
     connectWebSocket();
 
 });
+
+function themeSelectHandler() {
+    let themeClass = $('#theme-selector input:checked').attr('id');
+    $('#ledcontrolpage')
+        .removeClass('ui-page-theme-a ui-page-theme-b ui-page-theme-c')
+        .addClass('ui-page-theme-' + themeClass);
+}
 
 function restAPI(path) {
     restAPIWithCallback(path, null);
