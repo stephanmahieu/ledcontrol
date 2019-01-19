@@ -38,23 +38,19 @@ public class AvrdudeRunner {
     public AvrdudeRunner() {
     }
 
-    // TODO actually run avrdude
-    public void runAvrdude() {
+    public void runAvrdude(final Path hexFile, final String device, final String comport, boolean doTest) {
         ProcessBuilder pb = new ProcessBuilder();
         Path avrdudeApp = findAvrdudeApp(pb.environment());
+        Path avrdudeCfg = findAvrdudeCfg(avrdudeApp);
 
-        if (avrdudeApp != null) {
-            Path avrdudeCfg = findAvrdudeCfg(avrdudeApp.getParent());
-
-            pb.command(avrdudeApp.toString(), "-?");
+        if (avrdudeApp != null && avrdudeCfg != null) {
+            List<String> command = createAvrDudeCommand(avrdudeApp, avrdudeCfg, hexFile, device, comport, doTest);
+            pb.command(command);
         } else {
-            if (IS_WINDOWS) {
-                pb.command("cmd.exe", "/c", "dir /ogen");
-            } else {
-                pb.command("sh", "-c", "ls -ltr");
-            }
+            websocketLog.sendBody("Unable to run avrdude, could not find application plus configuration!");
         }
 
+        // set home working directory
         pb.directory(new File(System.getProperty("user.home")));
 
         try {
@@ -82,6 +78,28 @@ public class AvrdudeRunner {
         }
     }
 
+    private List<String> createAvrDudeCommand(final Path avrdudeApp, final Path avrdudeCfg, final Path hexFile, final String device, final String comport, final boolean doTest) {
+        List<String> commands = new ArrayList<>();
+
+        // Executable
+        commands.add(avrdudeApp.toString());       // Avrdude executable
+
+        // Parameters
+        if (doTest) {
+            commands.add("-n");                    // Do not write anything to the device (DEBUG)
+        }
+        commands.addAll(Arrays.asList(
+                "-C" + avrdudeCfg,                 // Location of configuration file
+                "-v", "-v",                        // Verbose output. -v -v for more
+                "-p" + device,                     // The AVR device
+                "-cwiring",                        // Programmer type
+                "-P" + comport,                    // Connection port
+                "-b115200",                        // The RS-232 baud rate
+                "-D",                              // Disable auto erase for flash memory
+                "-Uflash:w:\"" + hexFile + "\":i"  // <memtype>:r|w|v:<filename>[:format]
+        ));
+        return commands;
+    }
 
     private Path findAvrdudeApp(final Map<String, String> env) {
         List<String> paths = getEnvironmentPaths(env);
@@ -106,7 +124,12 @@ public class AvrdudeRunner {
         return avrdudeApp;
     }
 
-    private Path findAvrdudeCfg(final Path avrdudeAppDirectory) {
+    private Path findAvrdudeCfg(final Path avrdudeApp) {
+        if (avrdudeApp == null) {
+            return null;
+        }
+
+        Path avrdudeAppDirectory = avrdudeApp.getParent();
         Path cfgPath = Paths.get(avrdudeAppDirectory.getParent().toString(), "etc/avrdude.conf");
 
         if (!Files.exists(cfgPath) && !IS_WINDOWS) {
@@ -162,7 +185,6 @@ public class AvrdudeRunner {
             // try to find the app in each dir
             try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(directory))) {
                 for (Path filepath : directoryStream) {
-                    //websocketLog.sendBody("  - file: " + filepath.toString());
                     if (foundApp == null) {
                         foundApp = findApp(filepath, appNames);
                     }

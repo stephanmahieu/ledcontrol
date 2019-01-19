@@ -47,8 +47,10 @@ public class UploadService {
         // get path parameters
         final String comport = ((String) exchange.getIn().getHeader("comport")).replaceAll("_", "/");
         final String device = (String) exchange.getIn().getHeader("device");
+        final String doTestStr = (String) exchange.getIn().getHeader("doTest");
+        final boolean doTest = "True".equals(doTestStr);
 
-        LOG.info("Processing uploaded file for device [{}] on COM port [{}]...", device, comport);
+        LOG.info("Processing uploaded file for device [{}] on COM port [{}] (test: {})...", device, comport, doTestStr);
 
         // save submitted file attachment
         final Path uploadedFile = saveAttachment(exchange);
@@ -65,7 +67,7 @@ public class UploadService {
             // TODO run avrdude command to upload the new sketch
             websocketLog.sendBody("Uploading sketch to Arduino ("+ device + ") via USB-port " + comport + "...");
 
-            avrdudeRunner.runAvrdude();
+            avrdudeRunner.runAvrdude(uploadedFile, device, comport, doTest);
 
             // wait a few seconds for all output to arrive
             sleep(2000);

@@ -302,8 +302,10 @@ function uploadHandler(event) {
     let device = $('#device').val();
     let comport = $('#comport').val();
 
+    let doTest = $("#test-sketch").prop('checked');
+
     $.ajax( {
-        url: '/rest/api/upload/' + escapeForwardSlash(comport) + '/' + device,
+        url: '/rest/api/upload/' + escapeForwardSlash(comport) + '/' + device + '?doTest=' + (doTest?'True':'False'),
         type: 'POST',
         timeout: 30000,
         data: new FormData(this),
