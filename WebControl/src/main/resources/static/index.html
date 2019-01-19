@@ -4,12 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LED Control</title>
-    <link rel="stylesheet" href="/css/jquery.mobile-1.4.5.min.css">
-    <link rel="stylesheet" href="/css/ledcontrol.css" type="text/css">
-    <script src="/javascript/reconnecting-websocket.min.js" type="text/javascript"></script>
-    <script src="/javascript/jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="/javascript/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
-    <script src="/javascript/ledcontrol.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="css/custom-theme.min.css">
+    <link rel="stylesheet" href="css/jquery.mobile.icons.min.css" />
+    <link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css">
+    <link rel="stylesheet" href="css/ledcontrol.css" type="text/css">
+    <script src="javascript/reconnecting-websocket.min.js" type="text/javascript"></script>
+    <script src="javascript/jquery-2.1.4.min.js" type="text/javascript"></script>
+    <script src="javascript/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
+    <script src="javascript/ledcontrol.js" type="text/javascript"></script>
 </head>
 <body>
 <div id="ledcontrolpage" data-role="page" data-theme="b">
@@ -30,9 +32,11 @@
 
             <div class="ui-block-b">
                 <div id="theme-selector" data-role="controlgroup" data-type="horizontal" class="ui-mini">
-                    <label for="b">Dark theme</label>
+                    <label for="b">Dark</label>
                     <input type="radio" name="theme" id="b" checked>
-                    <label for="a">Light theme</label>
+                    <label for="c">Medium</label>
+                    <input type="radio" name="theme" id="c">
+                    <label for="a">Light</label>
                     <input type="radio" name="theme" id="a">
                 </div>
             </div>

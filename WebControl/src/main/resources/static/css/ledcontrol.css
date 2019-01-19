@@ -88,16 +88,11 @@
 .ui-page-theme-a .current-effect {
 	color: #d42d33 !important;
 }
-.ui-page-theme-b .current-effect {
+.ui-page-theme-b .current-effect,
+.ui-page-theme-c .current-effect{
 	color: #b1ff00 !important;
 }
 
-
-/* Override active color */
-.ui-btn-active, .ui-flipswitch-active {
-	background-color: #1a6c91 !important;
-	border-color: #1a7ba1 !important;
-}
 
 /* Flipswitch with custom width and indentations to accommodate longer label */
 .custom-size-flipswitch.ui-flipswitch .ui-btn.ui-flipswitch-on {
