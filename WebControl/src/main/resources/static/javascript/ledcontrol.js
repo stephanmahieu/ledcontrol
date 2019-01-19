@@ -4,15 +4,12 @@ let websocket;
 let isDebugOn = false;
 
 $(document).ready(function(){
-    let dimObj = $("#dim");
-    let dimSwitchObj = $("#manual-dim");
 
-    dimObj.on("slidestop vclick blur", dimChangeHandler);
+    $("#dim").on("slidestop vclick blur", dimChangeHandler);
 
-    // set initial state flipswitch to off
-    dimSwitchObj.prop('checked', false).flipswitch('refresh');
-
-    dimSwitchObj.on("change", dimSwitchChangeHandler);
+    $("#manual-dim")
+        .prop('checked', false).flipswitch('refresh')
+        .on("change", dimSwitchChangeHandler);
 
     $(".effect").click(effectChangeHandler);
 
