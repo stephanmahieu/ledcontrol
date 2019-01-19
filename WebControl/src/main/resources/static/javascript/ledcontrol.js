@@ -25,17 +25,8 @@ $(document).ready(function(){
         restAPI('command/Hello-world!');
     });
 
-    $("#debugOn").click(function(event) {
-        restAPI('debug/true');
-        websocket.debug = true;
-        isDebugOn = true;
-    });
-
-    $("#debugOff").click(function(event) {
-        restAPI('debug/false');
-        websocket.debug = false;
-        isDebugOn = false;
-    });
+    $("#debugOn").click(debugChangeHandler);
+    $("#debugOff").click(debugChangeHandler);
 
     $("#clear").click(function(event) {
         $('#input').text("");
@@ -95,6 +86,19 @@ function effectChangeHandler(event) {
         $(".current-effect").removeClass("current-effect");
         event.currentTarget.classList.add("current-effect");
     });
+}
+
+function debugChangeHandler(event) {
+    let debugId = event.currentTarget.id;
+    if ('debugOn' === debugId) {
+        restAPI('debug/true');
+        websocket.debug = true;
+        isDebugOn = true;
+    } else {
+        restAPI('debug/false');
+        websocket.debug = false;
+        isDebugOn = false;
+    }
 }
 
 function connectWebSocket() {
@@ -235,6 +239,19 @@ function initControlsWithStatusInfo(statusData) {
                 .on("change", dimSwitchChangeHandler);
         }
         dimObj.slider('disable');
+    }
+    if (status.debugOn === false || status.debugOn === true) {
+        let isDebugStatus = (status.debugOn === true);
+        $("#debugOn")
+            .off('click')
+            .prop('checked',isDebugStatus).checkboxradio("refresh")
+            .on('click', debugChangeHandler);
+        $("#debugOff")
+            .off('click')
+            .prop('checked',!isDebugStatus).checkboxradio("refresh")
+            .on('click', debugChangeHandler);
+        websocket.debug = isDebugStatus;
+        isDebugOn = isDebugStatus;
     }
 }
 
