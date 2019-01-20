@@ -1,7 +1,7 @@
 const WEBSOCKET_URI = "ws://" + (document.location.hostname === "" ? "localhost" : document.location.hostname) + ":9292/websocket-pub";
 let websocket;
 
-let isDebugOn = false;
+let isDebugOn = true;
 
 $(document).ready(function(){
 
@@ -22,8 +22,12 @@ $(document).ready(function(){
         restAPI('command/Hello-world!');
     });
 
-    $("#debugOn").click(debugChangeHandler);
-    $("#debugOff").click(debugChangeHandler);
+    $("#debugOn")
+        .prop('checked', true).checkboxradio("refresh")
+        .click(debugChangeHandler);
+    $("#debugOff")
+        .prop('checked', false).checkboxradio("refresh")
+        .click(debugChangeHandler);
 
     $("#clear").click(function(event) {
         $('#input').text("");
