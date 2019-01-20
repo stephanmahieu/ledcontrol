@@ -67,7 +67,7 @@
             <h4>Monitor & Control</h4>
 
             <!-- 3 column grid -->
-            <div class="ui-grid-b ui-responsive" style="max-width:600px">
+            <div class="ui-grid-b ui-responsive ui-mini" style="max-width:600px">
                 <div class="ui-block-a"><a href="#" id="status"  data-role="button" data-icon="info"    data-iconpos="left" class="common">Get Status</a></div>
                 <div class="ui-block-b"><a href="#" id="reset"   data-role="button" data-icon="recycle" data-iconpos="left" class="common">Reset Arduino</a></div>
                 <div class="ui-block-c"><a href="#" id="command" data-role="button" data-icon="action"  data-iconpos="left">Send command</a></div>
@@ -84,12 +84,12 @@
                 </div>
             </div>
 
-            <div class="ui-grid-b ui-responsive" style="max-width:700px">
+            <div class="ui-grid-b ui-responsive ui-mini" style="max-width:700px">
                 <div id="debug-selector" data-role="controlgroup" data-type="horizontal" class="ui-block-a">
                     <label for="debugOn">Debug On</label>
                     <input id="debugOn" type="radio" name="debug" data-icon="tag">
                     <label for="debugOff">Debug Off</label>
-                    <input id="debugOff" type="radio" name="debug" data-icon="forbidden" checked>
+                    <input id="debugOff" type="radio" name="debug" data-icon="forbidden">
                 </div>
                 <div class="ui-block-b"><a href="#" id="clear"    data-role="button" data-icon="delete"    data-iconpos="left">Clear console</a></div>
                 <div class="ui-block-c"><a href="#" id="connect"  data-role="button" data-icon="refresh"   data-iconpos="left">Connect</a></div>
@@ -99,7 +99,7 @@
         <div data-role="collapsible" data-iconpos="right" style="max-width:1440px">
             <h4>Upload new sketch</h4>
             <form id="uploadform" enctype="multipart/form-data" action="/rest/api/upload" method="post" data-ajax="false">
-                <div class="ui-grid-c ui-responsive">
+                <div class="ui-grid-c ui-responsive ui-mini">
                     <div class="ui-block-a">
                         <input type="file" name="fileupload" id="fileupload"/>
                     </div>
@@ -128,7 +128,7 @@
                         <input type="checkbox" data-role="flipswitch" id="test-sketch" data-on-text="Test" data-off-text="Write" data-wrapper-class="big-flipswitch redgreen-flipswitch">
                     </div>
                 </div>
-                <div class="ui-grid-solo">
+                <div class="ui-grid-solo ui-mini">
                     <div class="ui-block-a">
                         <input type="submit" value="Upload File" name="submit" data-inline="true" data-icon="arrow-u">
                     </div>
