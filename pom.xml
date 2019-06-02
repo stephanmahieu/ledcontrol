@@ -23,7 +23,7 @@
         <!-- 3rd party library versions -->
         <springboot.version>2.1.1.RELEASE</springboot.version>
         <springframework.version>5.1.3.RELEASE</springframework.version>
-        <apache.camel.version>2.23.0</apache.camel.version>
+        <apache.camel.version>2.24.0</apache.camel.version>
         <rxtxcomm.version>2.2pre2</rxtxcomm.version>
         <apache.james.version>0.7.2</apache.james.version>
         <undertow-websockets-jsr-version>2.0.16.Final</undertow-websockets-jsr-version>
