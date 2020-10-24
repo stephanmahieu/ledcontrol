@@ -98,10 +98,14 @@ public class SerialConsumer extends DefaultConsumer implements SerialPortEventLi
     protected void doSuspend() {
         LOG.debug("Suspend SerialConsumer...");
         try {
-            serialPort.notifyOnDataAvailable(false);
-            serialPort.removeEventListener();
+            if (serialPort != null) {
+                serialPort.notifyOnDataAvailable(false);
+                serialPort.removeEventListener();
+            }
 
-            endpoint.serialSuspend();
+            if (endpoint != null) {
+                endpoint.serialSuspend();
+            }
             super.doSuspend();
         } catch (Exception e) {
             LOG.error("Error suspending SerialConsumer", e);

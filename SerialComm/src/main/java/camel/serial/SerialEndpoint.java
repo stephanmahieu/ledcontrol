@@ -161,9 +161,15 @@ public class SerialEndpoint extends DefaultEndpoint {
 	}
 
 	private void disconnect() throws Exception {
-		in.close();
-		out.close();
-		serialPort.close();
+		if (in != null) {
+			in.close();
+		}
+		if (out != null) {
+			out.close();
+		}
+		if (serialPort != null) {
+			serialPort.close();
+		}
 	}
 
 	protected void serialSuspend() throws Exception {
