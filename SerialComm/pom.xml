@@ -46,13 +46,6 @@
 			<groupId>org.rxtx</groupId>
 			<artifactId>rxtxcomm</artifactId>
 		</dependency>
-
-		<!-- Needed for running tests -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 </project>
