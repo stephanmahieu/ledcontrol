@@ -21,7 +21,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- 3rd party library versions -->
-        <springboot.version>2.1.10.RELEASE</springboot.version>
+        <springboot.version>2.5.12</springboot.version>
         <springframework.version>5.1.18.RELEASE</springframework.version>
 
         <apache.camel.version>2.25.3</apache.camel.version>
