@@ -22,7 +22,7 @@
 
         <!-- 3rd party library versions -->
         <springboot.version>2.1.10.RELEASE</springboot.version>
-        <springframework.version>5.1.18.RELEASE</springframework.version>
+        <springframework.version>6.0.0</springframework.version>
 
         <apache.camel.version>2.25.3</apache.camel.version>
         <rxtxcomm.version>2.2pre2</rxtxcomm.version>
